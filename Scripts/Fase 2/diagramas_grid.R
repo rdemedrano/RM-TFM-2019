@@ -40,11 +40,14 @@ randomCenters <- spsample(df, 10, type = "random")
 vp <- voronoipolygons(randomCenters)
 proj4string(vp) <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ")
 plot(vp)
+plot(df, color = "red", add = TRUE)
+data.frame(df, grid = over(df, vp))
+spplot(vp) # Para poder hacer ssplot necesariamente tienes que tener un SpatialPolygonsDataFrame 
 
 df <- randomCenters
 # GRID CUADRADO:
 # Si lo que buscamos es un grid normal y corriente, se puede crear así:
-grid  <- GridTopology(cellcentre.offset= c(-3.7,40.39), cellsize = c(0.03,0.03), cells.dim = c(5,5)) # Centro, distancia de cada celda, y número de celdas en cada dimensión
+grid  <- GridTopology(cellcentre.offset= c(-3.7,40.39), cellsize = c(0.03,0.03), cells.dim = c(3,3)) # Centro, distancia de cada celda, y número de celdas en cada dimensión
 sg    <- SpatialGrid(grid)
 poly  <- as.SpatialPolygons.GridTopology(grid)
 # NO OLVIDES ESTO SI QUIERES JUNTAR TODO EN LA MISMA GRÁFICA Y HACER OVER. Quizás vale con CRS("+proj=longlat") (en todos claro)
@@ -53,3 +56,4 @@ plot(poly)
 plot(df, color = "red", add = TRUE)
 # Esto hace un data.frame con el grid al que pertenece cada coordenada
 data.frame(df, grid = over(df, poly))
+# En el post del grid numerado se puede ver como pasar de esta cuadrícula a un spdf si fuese necesario para un spplot o lo que fuese.
