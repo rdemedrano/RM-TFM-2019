@@ -54,3 +54,8 @@ number_crash[is.na(number_crash)] <- 0
 
 # 10_ Ahora simplemente se pone en forma de matriz para la entrada en la STNN mediante dcast de data.table
 crash <- dcast(number_crash, FECHA~zona)
+crash <- crash[, FECHA := NULL]
+write.table(crash, file = "Raw_data/crash.csv", row.names = FALSE, col.names = FALSE)
+
+# 11_ A continuación se construye la matriz de adjacencia en matlab
+
