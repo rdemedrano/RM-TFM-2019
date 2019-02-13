@@ -75,6 +75,7 @@ direcciones <- rbind(dir1, dir2)
 #    y Nº, y que esté ordenado exactamente igual que direcciones, es decir, que Geocode. Luego se juntan ambos datasets,
 #    este auxiliar y Geocode, que ya tendrá la latitud y longitud para cada ubicación que en el mismo formato que Accidentalidad.
 #    Por último se hace un join (paquete plyr) de este nuevo dataset y de Accidentalidad.
+# MUCHO CUIDADO CON QUE NO HAYA REPETICIONES EN GEOCODED 
 
 aux1 <- data.table(unique(cbind("LUGAR ACCIDENTE" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº != 0]$`LUGAR ACCIDENTE`, 
                                    "Nº" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº != 0]$Nº)))
