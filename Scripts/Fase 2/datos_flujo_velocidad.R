@@ -6,13 +6,15 @@ library(data.table); library(lubridate)
 
 # ===== GENERACIÓN DE LOS MESES =====
 directorio = "../Accidentes de tráfico - Madrid/Raw_data"
-fecha = "01-2017.csv"
+fecha = "01-2015.csv"
 
 dt = fread(paste(directorio, fecha, sep = "/"))
 
 # 1_ En primer lugar nos aseguramos de eliminar aquellos puntos de medida de la M-30, pues solo nos interesan
 # accidentes urbanos.
 dt <- dt[!grepl("M-30", tipo_elem) & !grepl("M30", tipo_elem)]
+dt[, identif := NULL]
+colnames(dt)[1] <- "id"
 # 2_ Como vamos a querer unirlo al dataset principal, y por comodidad, se separa la fecha y hora y se ordena
 #    también por comodidad.
 dt[, c("FECHA", "RANGO HORARIO") := tstrsplit(fecha, " ", fixed=TRUE)]
@@ -30,13 +32,13 @@ dt <- dt[, .N, by = list(id, FECHA, `RANGO HORARIO`, int_med, v_med)]
 dt[, N := NULL]
 
 # 6_ Se guarda el nuevo dataset.
-"01-2017" <- dt
-save("01-2017", file = "../Accidentes de tráfico - Madrid/Raw_data/01-2017.RData")
+"01-2015" <- dt
+save("01-2015", file = "../Accidentes de tráfico - Madrid/Raw_data/01-2015.RData")
 
 
 # ===== GENERACIÓN DE UN AÑO =====
 # directorio = "../Accidentes de tráfico - Madrid/Raw_data"
-# año = "2017.RData"
+# año = "2015.RData"
 # 
 # load(paste(directorio, paste0("01-", año), sep = "/"))
 # load(paste(directorio, paste0("02-", año), sep = "/"))
@@ -51,6 +53,6 @@ save("01-2017", file = "../Accidentes de tráfico - Madrid/Raw_data/01-2017.RDat
 # load(paste(directorio, paste0("11-", año), sep = "/"))
 # load(paste(directorio, paste0("12-", año), sep = "/"))
 # 
-# "2017_trafico" <- rbind(`01-2017`, `02-2017`, `03-2017`, `04-2017`, `05-2017`, `06-2017`,
-#                         `07-2017`, `08-2017`, `09-2017`, `10-2017`, `11-2017`, `12-2017`) 
-# save("2017_trafico", file = "../Accidentes de tráfico - Madrid/Raw_data/2017_trafico.RData")
+# "2015_trafico" <- rbind(`01-2015`, `02-2015`, `03-2015`, `04-2015`, `05-2015`, `06-2015`,
+#                         `07-2015`, `08-2015`, `09-2015`, `10-2015`, `11-2015`, `12-2015`)
+# save("2015_trafico", file = "../Accidentes de tráfico - Madrid/Raw_data/2015_trafico.RData")
