@@ -13,6 +13,7 @@ dt = fread(paste(directorio, fecha, sep = "/"))
 # 1_ En primer lugar nos aseguramos de eliminar aquellos puntos de medida de la M-30, pues solo nos interesan
 # accidentes urbanos.
 dt <- dt[!grepl("M-30", tipo_elem) & !grepl("M30", tipo_elem)]
+# dt <- dt[tipo_elem == 495]
 dt[, identif := NULL]
 colnames(dt)[1] <- "id"
 # 2_ Como vamos a querer unirlo al dataset principal, y por comodidad, se separa la fecha y hora y se ordena
