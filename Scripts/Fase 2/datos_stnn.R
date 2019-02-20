@@ -7,7 +7,8 @@ load("../Accidentes de tráfico - Madrid/Cleaned_data/GeoAccidentalidad.RData")
 # 2_ Nos interesan solo día (fecha), dirección y número de accidentes (no lo saca todavía, ahora mismo solo podemos 
 # saber número de afectados por accidente). Hay que tener en cuenta que los accidentes
 # están repetidos, pero esto ya lo tiene en cuenta el by. Es decir, reune todos aquellos elementos con la misma fecha,
-# rango y posición. Las autovías (NAs) hay que quitarlas,
+# rango y posición, por lo que la columna de las Ns sobra (pues nos dice precisamente el número de veces que se repite
+# cierto accidente, el número de personas involucradas). Las autovías (NAs) hay que quitarlas,
 car_crash <- GeoAccidentalidad[ , .N, by = list(FECHA, `RANGO HORARIO`, lon, lat)]
 car_crash <- na.omit(car_crash)
 
