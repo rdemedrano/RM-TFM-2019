@@ -46,6 +46,7 @@ library(xgboost)
 
 # La fecha ya no nos interesa
 num_acc[, FECHA := NULL]
+# num_acc <- num_acc[, -c(5,6,8,9,10)]
 
 # Dividimos el dataset en dos: uno para el entrenamiento, otro para la validación.
 sample <- seq(1, floor(.98*nrow(num_acc)))
@@ -76,15 +77,26 @@ dtrain <- xgb.DMatrix(data = new_tr , label=labels)
 dtest <- xgb.DMatrix(data = new_ts , label=ts_label)
 
 params <- list(booster = "gbtree", objective = "reg:linear",
-               eta=0.3, gamma=0, max_depth=16, min_child_weight=1, subsample=1, colsample_bytree=1)
+               eta=0.08, gamma=2.7, lambda = 1, max_depth=12, min_child_weight=6, subsample=0.7, colsample_bytree=0.9)
 
-xgb1 <- xgb.train (params = params, data = dtrain, nrounds = 80,
+# xgbcv <- xgb.cv( params = params, data = dtrain, nrounds = 100, nfold = 5, 
+#                  showsd = T, stratified = T, print_every_n = 10, early_stop_round = 20, maximize = F)
+
+xgb1 <- xgb.train (params = params, data = dtrain, nrounds = 70,
                    watchlist = list(val=dtest,train=dtrain), verbose = 1, print_every_n = 10, early_stop_round = 10, 
                    maximize = F , eval_metric = "rmse") # Aunque esto del error lo hace automático al poner regresión creo
 
 xgbpred <- predict (xgb1,dtest)
 comparar <- data.table(test$N, xgbpred)
-rmse <- sqrt(1/nrow(test)*sum((xgbpred - test$N)^2))
+# rmse <- sqrt(1/nrow(test)*sum((xgbpred - test$N)^2))
 
 mat <- xgb.importance (feature_names = colnames(new_tr),model = xgb1)
 xgb.plot.importance (importance_matrix = mat[1:10])
+
+# library(ModelMetrics)
+# No entiendo por que esto me da otras predicciones. En cualquier caso, las funciones van bien
+# si utilizo xgbpred
+# y_hat_xgb <- predict(xgb1, data.matrix(test))
+# xgb_mae <- mae(test$N, y_hat_xgb)
+# xgb_rmse <- rmse(test$N, y_hat_xgb)
+# xgb_recall <- recall(test$N, y_hat_xgb)
