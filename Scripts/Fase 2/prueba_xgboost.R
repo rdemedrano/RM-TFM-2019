@@ -46,7 +46,7 @@ library(xgboost)
 
 # La fecha ya no nos interesa
 num_acc[, FECHA := NULL]
-# num_acc <- num_acc[, -c(5,6,8,9,10)]
+# num_acc <- num_acc[, -c(6,8,9,10)]
 
 # Dividimos el dataset en dos: uno para el entrenamiento, otro para la validación.
 sample <- seq(1, floor(.98*nrow(num_acc)))
@@ -56,13 +56,13 @@ test  <- num_acc[-sample, ]
 # Ahora hay que pasar a numérico las variables que no lo son. Así, para las que son strings de esta manera
 # puedes crear una variable dummy, es decir, estas nuevas matrices tienen tantas columnas como variables y posibles
 # valores de las variables que no son numéricas, de forma que en cada fila se asigna 0 o 1 en cada columna según pertenezca
-# a esa clase o no.
+# a esa clase o no. ONE-HOT ENCODING
 labels <- train$N 
 ts_label <- test$N
 # new_tr <- model.matrix(~.+0,data = train[,-c("N"),with=F])
 # new_ts <- model.matrix(~.+0,data = test[,-c("N"),with=F])
 
-# Otra posibilidad es:
+# Otra posibilidad es INTEGER ENCODING:
 train$DISTRITO = as.numeric(factor(train$`DISTRITO`,unique(train$`DISTRITO`)))
 train$`DIA SEMANA` = as.numeric(factor(train$`DIA SEMANA`,unique(train$`DIA SEMANA`)))
 
