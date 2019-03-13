@@ -38,6 +38,7 @@ plot(sd, color = "red", add = TRUE)
 zonas <- data.frame(sd, zona = over(sd, poly))
 
 # 7_ Se hace un merge de ambas tablas, zonas y car_crash
+# adfadsad
 car_crash <- join(car_crash, zonas)
 car_crash <- na.omit(car_crash)
 car_crash <- car_crash[, .N, by = list(FECHA, zona)]
