@@ -1,5 +1,5 @@
 {
-    "activation": "tanh",
+    "activation": "identity",
     "batch_size": 1000,
     "beta1": 0.0,
     "beta2": 0.999,
@@ -18,8 +18,8 @@
     "mode": null,
     "nd": 1,
     "nepoch": 10000,
-    "nhid": 0,
-    "nlayers": 1,
+    "nhid": 3,
+    "nlayers": 3,
     "np": 1,
     "nt": 365,
     "nt_train": 355,

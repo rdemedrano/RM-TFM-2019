@@ -31,10 +31,10 @@ p.add('--xp', type=str, help='xp name', default='stnn')
 # -- model
 p.add('--mode', type=str, help='STNN mode (default|refine|discover)', default='default')
 p.add('--nz', type=int, help='laten factors size', default=1)
-p.add('--activation', type=str, help='dynamic module activation function (identity|tanh)', default='tanh')
+p.add('--activation', type=str, help='dynamic module activation function (identity|tanh)', default='identity')
 p.add('--khop', type=int, help='spatial depedencies order', default=1)
-p.add('--nhid', type=int, help='dynamic function hidden size', default=0)
-p.add('--nlayers', type=int, help='dynamic function num layers', default=1)
+p.add('--nhid', type=int, help='dynamic function hidden size', default=3)
+p.add('--nlayers', type=int, help='dynamic function num layers', default=3)
 p.add('--dropout_f', type=float, help='latent factors dropout', default=.0)
 p.add('--dropout_d', type=float, help='dynamic function dropout', default=.0)
 p.add('--lambd', type=float, help='lambda between reconstruction and dynamic losses', default=.1)
@@ -116,8 +116,7 @@ model = SaptioTemporalNN(relations, exogenous_train, opt.nx, opt.nt_train, opt.n
 # Optimizer
 #######################################################################################################################
 params = [{'params': model.factors_parameters(), 'weight_decay': opt.wd_z},
-#          {'params': model.dynamic.parameters()},
-          {'params': model.dynamic2.parameters()},
+          {'params': model.dynamic.parameters()},
           {'params': model.decoder.parameters()}]
 if opt.mode in ('refine', 'discover'):
     params.append({'params': model.rel_parameters(), 'weight_decay': 0.})
@@ -185,8 +184,7 @@ for e in pb:
         input_x = idx_dyn[1][batch]
         # closure
         z_inf = model.factors[input_t, input_x]
-#        z_pred = model.dyn_closure(input_t - 1, input_x)
-        z_pred = model.dyn2_closure(input_t - 1, input_x)
+        z_pred = model.dyn_closure(input_t - 1, input_x)
         # loss
         mse_dyn = z_pred.sub(z_inf).pow(2).mean()
         loss_dyn = mse_dyn * opt.lambd
