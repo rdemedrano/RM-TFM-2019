@@ -51,7 +51,7 @@ zonas <- data.frame(sd, zona = over(sd, poly))
 zonas_pmed <- data.frame(sd_traf, zona = over(sd_traf, poly))
 
 # 7_ Se hace un merge de ambas tablas, zonas y car_crash/p_med
-car_crash <- join(car_crash, zonas)
+car_crash <- unique(join(car_crash, zonas))
 car_crash <- na.omit(car_crash)
 car_crash <- car_crash[, .N, by = list(FECHA, zona)]
 colnames(car_crash)[3] <- "Número de accidentes"
