@@ -54,8 +54,7 @@ class SaptioTemporalNN(nn.Module):
         # En este caso la función dinámica es nada más y nada menos que un MLP, que en el caso sencillo es solo una transfor
         # mación lienal, tal y como comenta en el paper.
         # Lo único es que esta vez la entrada es de más de una variable, dependiendo de nz y nr. La salida sigue siendo nz.
-        self.dynamic = MLP(nz * self.nr, nhid, nz, nlayers, dropout_d)
-        self.dynamic2 = MLP(nz * self.nr + np, nhid, nz, nlayers, dropout_d)
+        self.dynamic = MLP(nz * self.nr + np * 2, nhid, nz, nlayers, dropout_d)
         # El famoso decoder. En el paper no se aportan expresiones para él, por lo que no tengo muy claro porque se ha decido
         # por este en concreto. 
         # En cualquier caso, nn.Linear aplica una transformación lineal de un espacio de nz dimensiones a otro de nd. Funciona
@@ -109,12 +108,13 @@ class SaptioTemporalNN(nn.Module):
         """
         z_context = self.get_relations().matmul(z).view(-1, self.nr * self.nz)
         if self.np != 0:
-            z_cat = torch.cat((z_context, exogenous_var),1)
+            exo_context = self.get_relations().matmul(exogenous_var).view(-1, self.nr * self.np)
+            z_cat = torch.cat((z_context, exo_context),1)
 #          z_next = self.dynamic(z_context)
-            z_next = self.dynamic2(z_cat)
+            z_next = self.dynamic(z_cat)
             return self.activation(z_next)
         else:
-            z_next = self.dynamic2(z_context)
+            z_next = self.dynamic(z_context)
             return self.activation(z_next)
              
 
@@ -141,6 +141,7 @@ class SaptioTemporalNN(nn.Module):
         x_rec = self.decoder(z_inf)
         return x_rec
 
+    
     def dyn_closure(self, t_idx, x_idx):
         """
         "Entrenamiento" de la función dinámica (g en el paper). Realmente no existe un entrenamiento
@@ -157,22 +158,17 @@ class SaptioTemporalNN(nn.Module):
         # con el producto escalar de la fila de W que toque con las Z anteriores para su uso en la ecuación (4). Si Z tiene más
         # dimensión que uno, pues serán más componentes.
         z_context = rels[x_idx].matmul(z_input).view(-1, self.nr * self.nz)
-        #Se aplica el dinamic.
-        z_gen = self.dynamic(z_context)
-        return self.activation(z_gen)
-    
-    def dyn2_closure(self, t_idx, x_idx):
-        rels = self.get_relations()
-        z_input = self.drop(self.factors[t_idx])
-        z_context = rels[x_idx].matmul(z_input).view(-1, self.nr * self.nz)
         if self.np != 0:
-            perm = torch.LongTensor([torch.Tensor.numpy(t_idx), torch.Tensor.numpy(x_idx)])
-            exo = self.exogenous[perm[0], perm[1]]
-            z_cat = torch.cat((z_context, exo),1)
-            z_gen = self.dynamic2(z_cat)
+#            perm = torch.LongTensor([torch.Tensor.numpy(t_idx + 1), torch.Tensor.numpy(x_idx)])
+#            exo = self.exogenous[perm[0], perm[1]] SIN W EN EXOGENAS
+#            exo = self.exogenous[perm[0]]
+            exo_input = self.exogenous[t_idx+1]
+            exo_context = rels[x_idx].matmul(exo_input).view(-1, self.nr * self.np)
+            z_cat = torch.cat((z_context, exo_context),1)
+            z_gen = self.dynamic(z_cat)
             return self.activation(z_gen)
         else:
-            z_gen = self.dynamic2(z_context)
+            z_gen = self.dynamic(z_context)
             return self.activation(z_gen)
         
         
@@ -185,14 +181,18 @@ class SaptioTemporalNN(nn.Module):
         # Se coge el valor de z del último de los ejemplos de entrenamiento parece ser (todo esto suponiendo que factors es
         # lo que estoy suponiendo que es). A partir de él se calcularán el primero nuevo, a partir de este el segundo, y así.        
         z = self.factors[-1]
-        ex = self.exogenous[-1]
+#        ex = self.exogenous[-1]
         z_gen = []
         for t in range(nsteps):
-            if t == 0:
-                z = self.update_z(z, ex)
-            else:
-                z = self.update_z(z, validation_exo[t-1])
+            z = self.update_z(z, validation_exo[t])
             z_gen.append(z)
+#        CON Zt+1 - LAMBDAt
+#        for t in range(nsteps):
+#            if t == 0:
+#                z = self.update_z(z, ex)
+#            else:
+#                z = self.update_z(z, validation_exo[t-1])
+#            z_gen.append(z)
         # Concatenación de tensores. Es decir, z_gen es una lista de tensores (cada update_z da uno), aquí se genera un único
         # tensor largo.
         # Prueba por ejemplo: torch.stack([torch.tensor([[1,2],[3,4]]), torch.tensor([[5,6],[7,8]])])
