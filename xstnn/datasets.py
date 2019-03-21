@@ -57,8 +57,8 @@ def crash(data_dir, file='crash.csv'):
 def crash_ex(data_dir, file='crash_ex.csv'):
     # dataset configuration
     opt = DotDict()
-    opt.nt = 365
-    opt.nt_train = 355
+    opt.nt = 1128
+    opt.nt_train = 1080
     opt.nx = 49
     opt.np = 1
     opt.nd = 1

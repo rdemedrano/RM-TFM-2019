@@ -54,7 +54,8 @@ class SaptioTemporalNN(nn.Module):
         # En este caso la función dinámica es nada más y nada menos que un MLP, que en el caso sencillo es solo una transfor
         # mación lienal, tal y como comenta en el paper.
         # Lo único es que esta vez la entrada es de más de una variable, dependiendo de nz y nr. La salida sigue siendo nz.
-        self.dynamic = MLP(nz * self.nr + np * 2, nhid, nz, nlayers, dropout_d)
+#        self.dynamic = MLP(nz * self.nr + np * 2, nhid, nz, nlayers, dropout_d)
+        self.dynamic = MLP(nz * self.nr + np * 4, nhid, nz, nlayers, dropout_d)
         # El famoso decoder. En el paper no se aportan expresiones para él, por lo que no tengo muy claro porque se ha decido
         # por este en concreto. 
         # En cualquier caso, nn.Linear aplica una transformación lineal de un espacio de nz dimensiones a otro de nd. Funciona
@@ -162,14 +163,45 @@ class SaptioTemporalNN(nn.Module):
 #            perm = torch.LongTensor([torch.Tensor.numpy(t_idx + 1), torch.Tensor.numpy(x_idx)])
 #            exo = self.exogenous[perm[0], perm[1]] SIN W EN EXOGENAS
 #            exo = self.exogenous[perm[0]]
-            exo_input = self.exogenous[t_idx+1]
-            exo_context = rels[x_idx].matmul(exo_input).view(-1, self.nr * self.np)
-            z_cat = torch.cat((z_context, exo_context),1)
+            exo_input_1 = self.exogenous[t_idx+1]
+            exo_input_0 = self.exogenous[t_idx]
+            exo_context_1 = rels[x_idx].matmul(exo_input_1).view(-1, self.nr * self.np)
+            exo_context_0 = rels[x_idx].matmul(exo_input_0).view(-1, self.nr * self.np)
+            z_cat = torch.cat((z_context, exo_context_0, exo_context_1),1)
             z_gen = self.dynamic(z_cat)
             return self.activation(z_gen)
         else:
             z_gen = self.dynamic(z_context)
             return self.activation(z_gen)
+        
+#        def dyn_closure(self, t_idx, x_idx):
+#        """
+#        "Entrenamiento" de la función dinámica (g en el paper). Realmente no existe un entrenamiento
+#        :param t_idx: índices de la serie temporal
+#        :param x_idx: índices de la serie en sí
+#        """
+#        # Se obtienen las relaciones.
+#        rels = self.get_relations()
+#        # Y los factors que toquen, con la posibilidad de ponerlos a 0.
+#        z_input = self.drop(self.factors[t_idx])
+#        # matmul es un producto matricial de tensores (se puede poner como torch.matmul(tensor, tensor2) o como tensor1.matmul(tensor2))
+#        # view devuelve un tensor con las mismas componentes que el inicial, pero con diferente shape. En este caso, pasa de
+#        # columna a fila. Para hacerlos una idea, es como que saca una fila de dos elementos, uno con la Z anterior y otro 
+#        # con el producto escalar de la fila de W que toque con las Z anteriores para su uso en la ecuación (4). Si Z tiene más
+#        # dimensión que uno, pues serán más componentes.
+#        z_context = rels[x_idx].matmul(z_input).view(-1, self.nr * self.nz)
+#        if self.np != 0:
+##            perm = torch.LongTensor([torch.Tensor.numpy(t_idx + 1), torch.Tensor.numpy(x_idx)])
+##            exo = self.exogenous[perm[0], perm[1]] SIN W EN EXOGENAS
+##            exo = self.exogenous[perm[0]]
+#            exo_input = self.exogenous[t_idx+1]
+#            exo_context = rels[x_idx].matmul(exo_input).view(-1, self.nr * self.np)
+#            z_cat = torch.cat((z_context, exo_context),1)
+#            z_gen = self.dynamic(z_cat)
+#            return self.activation(z_gen)
+#        else:
+#            z_gen = self.dynamic(z_context)
+#            return self.activation(z_gen)
         
         
     def generate(self, nsteps, validation_exo):
