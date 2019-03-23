@@ -99,24 +99,45 @@ class SaptioTemporalNN(nn.Module):
                 intra = self.relations[:, 0].unsqueeze(1)
                 inter = weights
             return torch.cat((intra, inter), 1)
-
+        
     def update_z(self, z, exogenous_var):
         """
         Dado un conjunto de Zs, calcula Zt+1. Presupone la existencia
-        de una función dinámica ya entrenada.
+        de una función dinámica ya entrenada, y de la entrada de variables exógenas
+        en diversos rangos temporales.
+        MÁS DE UN RANGO TEMPORAL
         :param z: el valor de las variables en el espacio latente
         :return Zt+1: el valor que toma el espacio latente en el siguiente tiempo
         """
         z_context = self.get_relations().matmul(z).view(-1, self.nr * self.nz)
         if self.np != 0:
-            exo_context = self.get_relations().matmul(exogenous_var).view(-1, self.nr * self.np)
-            z_cat = torch.cat((z_context, exo_context),1)
+            exo_context_0 = self.get_relations().matmul(exogenous_var[:,0]).view(-1, self.nr * self.np)
+            exo_context_1 = self.get_relations().matmul(exogenous_var[:,1]).view(-1, self.nr * self.np)
+            z_cat = torch.cat((z_context, exo_context_0, exo_context_1),1)
 #          z_next = self.dynamic(z_context)
             z_next = self.dynamic(z_cat)
             return self.activation(z_next)
         else:
             z_next = self.dynamic(z_context)
-            return self.activation(z_next)
+            return self.activation(z_next)   
+
+#    def update_z(self, z, exogenous_var):
+#        """
+#        Dado un conjunto de Zs, calcula Zt+1. Presupone la existencia
+#        de una función dinámica ya entrenada.
+#        :param z: el valor de las variables en el espacio latente
+#        :return Zt+1: el valor que toma el espacio latente en el siguiente tiempo
+#        """
+#        z_context = self.get_relations().matmul(z).view(-1, self.nr * self.nz)
+#        if self.np != 0:
+#            exo_context = self.get_relations().matmul(exogenous_var).view(-1, self.nr * self.np)
+#            z_cat = torch.cat((z_context, exo_context),1)
+##          z_next = self.dynamic(z_context)
+#            z_next = self.dynamic(z_cat)
+#            return self.activation(z_next)
+#        else:
+#            z_next = self.dynamic(z_context)
+#            return self.activation(z_next)
              
 
     def decode_z(self, z):
@@ -145,7 +166,8 @@ class SaptioTemporalNN(nn.Module):
     
     def dyn_closure(self, t_idx, x_idx):
         """
-        "Entrenamiento" de la función dinámica (g en el paper). Realmente no existe un entrenamiento
+        "Entrenamiento" de la función dinámica (g en el paper). Realmente no existe un entrenamiento.
+        MÁS DE UN RANGO TEMPORAL
         :param t_idx: índices de la serie temporal
         :param x_idx: índices de la serie en sí
         """
@@ -208,15 +230,17 @@ class SaptioTemporalNN(nn.Module):
         """
         Función que genera una salida para la variable de estudio y para la función
         Z del latent space. Lo hace para un número nsteps de pasos.
+        MÁS DE UN RANGO TEMPORAL
         :param nsteps: número de pasos temporales para los cuales se calculan las variables
         """
         # Se coge el valor de z del último de los ejemplos de entrenamiento parece ser (todo esto suponiendo que factors es
         # lo que estoy suponiendo que es). A partir de él se calcularán el primero nuevo, a partir de este el segundo, y así.        
         z = self.factors[-1]
-#        ex = self.exogenous[-1]
+        ex = self.exogenous[-1]
         z_gen = []
         for t in range(nsteps):
-            z = self.update_z(z, validation_exo[t])
+            z = self.update_z(z, torch.cat((ex, validation_exo[t]), 1))
+            ex = validation_exo[t]
             z_gen.append(z)
 #        CON Zt+1 - LAMBDAt
 #        for t in range(nsteps):
@@ -231,7 +255,36 @@ class SaptioTemporalNN(nn.Module):
         z_gen = torch.stack(z_gen)
         # Esto simplemente calcula las xs para esos valores de z.
         x_gen = self.decode_z(z_gen)
-        return x_gen, z_gen
+        return x_gen, z_gen    
+        
+#    def generate(self, nsteps, validation_exo):
+#        """
+#        Función que genera una salida para la variable de estudio y para la función
+#        Z del latent space. Lo hace para un número nsteps de pasos.
+#        :param nsteps: número de pasos temporales para los cuales se calculan las variables
+#        """
+#        # Se coge el valor de z del último de los ejemplos de entrenamiento parece ser (todo esto suponiendo que factors es
+#        # lo que estoy suponiendo que es). A partir de él se calcularán el primero nuevo, a partir de este el segundo, y así.        
+#        z = self.factors[-1]
+##        ex = self.exogenous[-1]
+#        z_gen = []
+#        for t in range(nsteps):
+#            z = self.update_z(z, validation_exo[t])
+#            z_gen.append(z)
+##        CON Zt+1 - LAMBDAt
+##        for t in range(nsteps):
+##            if t == 0:
+##                z = self.update_z(z, ex)
+##            else:
+##                z = self.update_z(z, validation_exo[t-1])
+##            z_gen.append(z)
+#        # Concatenación de tensores. Es decir, z_gen es una lista de tensores (cada update_z da uno), aquí se genera un único
+#        # tensor largo.
+#        # Prueba por ejemplo: torch.stack([torch.tensor([[1,2],[3,4]]), torch.tensor([[5,6],[7,8]])])
+#        z_gen = torch.stack(z_gen)
+#        # Esto simplemente calcula las xs para esos valores de z.
+#        x_gen = self.decode_z(z_gen)
+#        return x_gen, z_gen
 
     def factors_parameters(self):
         yield self.factors

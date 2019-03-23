@@ -30,7 +30,7 @@ p.add('--outputdir', type=str, help='path to save xp', default='output')
 p.add('--xp', type=str, help='xp name', default='stnn')
 # -- model
 p.add('--mode', type=str, help='STNN mode (default|refine|discover)', default='default')
-p.add('--nz', type=int, help='laten factors size', default=1)
+p.add('--nz', type=int, help='laten factors size', default=2)
 p.add('--activation', type=str, help='dynamic module activation function (identity|tanh)', default='identity')
 p.add('--khop', type=int, help='spatial depedencies order', default=1)
 p.add('--nhid', type=int, help='dynamic function hidden size', default=3)
