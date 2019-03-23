@@ -17,5 +17,5 @@ distancias <- distm(cruces[, c(7,8)], acc[, c(6,7)])
 acc[, `DIST CRUCE SEM` := apply(distancias, 2, min)]
 
 # 4_ Se genera una variable auxiliar que nos dice si estamos en un cruce semaforizado o no. Hacemos 
-acc$SEMAFORO <- ifelse(acc$`DIST CRUCE SEM` < 10, 1, 0)
+acc$SEMAFORO <- ifelse(acc$`DIST CRUCE SEM` < 20, 1, 0)
 acc_cruce <- acc[Nº == 0]
