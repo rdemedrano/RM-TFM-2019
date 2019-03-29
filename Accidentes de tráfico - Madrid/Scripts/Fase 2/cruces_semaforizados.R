@@ -1,5 +1,5 @@
 # Script para realizar el estudio de los cruces semaforizados
-library(data.table); library(geosphere)
+library(data.table); library(geosphere); library(lubridate)
 
 # 1_ Se cargan y general los datasets necesarios.
 load("Cleaned_data/GeoAccidentalidad.RData")
