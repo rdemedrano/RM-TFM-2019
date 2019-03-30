@@ -37,4 +37,7 @@ zonas <- data.frame(spatial_data, zona = over(spatial_data, barrios))
 zonas <- zonas[,c(1,2,7)]
 colnames(zonas)[3] <- "BARRIO"
 
-GeoAccidentalidad <- join(GeoAccidentalidad, zonas)
+BarriosAccidentalidad <- join(GeoAccidentalidad, unique(zonas))
+BarriosAccidentalidad$BARRIO <- as.numeric(as.character(BarriosAccidentalidad$BARRIO))
+
+save(BarriosAccidentalidad, file = "Cleaned_data/BarriosAccidentalidad.RData", compress = "xz")

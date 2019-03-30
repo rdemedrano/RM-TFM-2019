@@ -2,7 +2,7 @@
 # Script en el cual se realiza el geocoding de las calles. Por ahora será unicamente de aquellas
 # vías que no sean autovías, pues no entiendo muy bien cual es el criterio para clasificarlas.
 
-library(data.table); library(ggmap); library(beepr); library(plyr)
+library(data.table); library(ggmap); library(beepr); library(plyr);
 load("../Accidentes de tráfico - Madrid/Cleaned_data/Accidentalidad.RData")
 
 register_google(key = "AIzaSyBo4vW2UT8J5SjT88n3kqHN3e9t76ZUkmg")
@@ -77,14 +77,31 @@ direcciones <- rbind(dir1, dir2)
 #    Por último se hace un join (paquete plyr) de este nuevo dataset y de Accidentalidad.
 # MUCHO CUIDADO CON QUE NO HAYA REPETICIONES EN GEOCODED 
 
-aux1 <- data.table(unique(cbind("LUGAR ACCIDENTE" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº != 0]$`LUGAR ACCIDENTE`, 
-                                   "Nº" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº != 0]$Nº)))
-aux2 <- data.table(unique(cbind("LUGAR ACCIDENTE" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº == 0]$`LUGAR ACCIDENTE`, 
-                                "Nº" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº == 0]$Nº)))
-aux <- rbind(aux1, aux2)
-dirGeolocalizadas <- cbind(aux, "lat" = Geocoded$lat, "lon" = Geocoded$lon)
+# aux1 <- data.table(unique(cbind("LUGAR ACCIDENTE" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº != 0]$`LUGAR ACCIDENTE`, 
+#                                    "Nº" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº != 0]$Nº)))
+# aux2 <- data.table(unique(cbind("LUGAR ACCIDENTE" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº == 0]$`LUGAR ACCIDENTE`, 
+#                                 "Nº" = Accidentalidad[!grepl("AUTOVIA", `LUGAR ACCIDENTE`) & Nº == 0]$Nº)))
 
-GeoAccidentalidad <- join(Accidentalidad, dirGeolocalizadas)
+# aux <- rbind(aux1, aux2)
+# dirGeolocalizadas <- cbind(aux, "lat" = Geocoded$lat, "lon" = Geocoded$lon)
+# 
+# GeoAccidentalidad <- join(Accidentalidad, dirGeolocalizadas)
+# save(GeoAccidentalidad, file = "../Accidentes de tráfico - Madrid/Cleaned_data/GeoAccidentalidad.RData")
+
+Geocoded$Direcciones <- gsub('.{7}$', '', Geocoded$Direcciones)
+aux1 <- Geocoded[grepl("NUM", Direcciones)]
+aux2 <- Geocoded[!grepl("NUM", Direcciones) & !grepl("KM.", Direcciones)]
+aux1$Nº <- as.numeric(gsub("\\D", "", aux1$Direcciones))
+aux2$Nº <- 0
+aux1$Direcciones <- gsub("(NUM).*","\\1", aux1$Direcciones)
+aux1 <- aux1[, c(1,4,2,3)]
+aux2 <- aux2[, c(1,4,2,3)]
+colnames(aux1)[1] <- "LUGAR ACCIDENTE"
+colnames(aux2)[1] <- "LUGAR ACCIDENTE"
+
+aux <- rbind(aux1, aux2)
+
+GeoAccidentalidad <- join(Accidentalidad, aux)
 save(GeoAccidentalidad, file = "../Accidentes de tráfico - Madrid/Cleaned_data/GeoAccidentalidad.RData")
 
 # Para comprobar que dos columnas son enteras iguales (por ejemplo GeoAccidentalidad y Accidentalidad), se puede hacer
