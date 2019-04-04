@@ -40,4 +40,30 @@ colnames(zonas)[3] <- "BARRIO"
 BarriosAccidentalidad <- join(GeoAccidentalidad, unique(zonas))
 BarriosAccidentalidad$BARRIO <- as.numeric(as.character(BarriosAccidentalidad$BARRIO))
 
-save(BarriosAccidentalidad, file = "Cleaned_data/BarriosAccidentalidad.RData", compress = "xz")
+BarriosAccidentalidad <- BarriosAccidentalidad[, c(1:5, 29,27,28, 6:26)]
+
+# save(BarriosAccidentalidad, file = "Cleaned_data/BarriosAccidentalidad.RData", compress = "xz")
+
+
+
+# AHORA VAMOS A VER COMO SACAR LOS CENTROS DE CADA BARRIO PARA ASÍ PODER CALCULAR LA MATRIZ W.
+# Ojo porque hay que ordenarlos correctamente. Con barrios$CODBAR puedes ver a que barrio pertenece
+# cada centro con el mismo código utilizando anteriormente.
+library(geosphere)
+
+lonC <- vector()
+latC <- vector()
+
+for(i in 1:131){latC[i] <- barrios@polygons[[i]]@labpt[2]; lonC[i] <- barrios@polygons[[i]]@labpt[1]}
+centros <- data.frame(lon = lonC, lat = latC, barrio = as.numeric(as.character(barrios$CODBAR)))
+centros <- centros[order(centros$barrio),]
+coordinates(centros) <- ~ lon + lat
+proj4string(centros) <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ")
+
+plot(barrios) 
+plot(centros, add = TRUE)
+
+# De aquí simplemente se calcula la distancia de un centro con el resto
+distancias <- distm(centros[, c(1,2)], centros[, c(1,2)])
+
+write.table(distancias, file = "Raw_data/crash_ex_relations.csv", row.names = FALSE, col.names = FALSE)
