@@ -102,7 +102,7 @@ colnames(aux2)[1] <- "LUGAR ACCIDENTE"
 aux <- rbind(aux1, aux2)
 
 GeoAccidentalidad <- join(Accidentalidad, aux)
-save(GeoAccidentalidad, file = "../Accidentes de tráfico - Madrid/Cleaned_data/GeoAccidentalidad.RData")
+save(GeoAccidentalidad, file = "../Accidentes de tráfico - Madrid/Cleaned_data/GeoAccidentalidad.RData", compress = "xz")
 
 # Para comprobar que dos columnas son enteras iguales (por ejemplo GeoAccidentalidad y Accidentalidad), se puede hacer
 # identical(Accidentalidad$`LUGAR ACCIDENTE`, GeoAccidentalidad$`LUGAR ACCIDENTE`) 
