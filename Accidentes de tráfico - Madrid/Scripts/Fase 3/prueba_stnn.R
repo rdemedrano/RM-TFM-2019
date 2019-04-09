@@ -1,6 +1,8 @@
 # PREPARACIÓN DE DATOS PARA LA LA STNN PERO CON BARRIOS Y RANGO HORARIO. 
 # SIMULACRO DE EXPERIMENTO REAL
 
+
+# Cargamos paquetes y dataset
 library(data.table); library(lubridate); library(plyr); library(tidyr)
 load("../Accidentes de tráfico - Madrid/Cleaned_data/BarriosAccidentalidad.RData")
 

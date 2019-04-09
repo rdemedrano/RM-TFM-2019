@@ -57,13 +57,17 @@ latC <- vector()
 for(i in 1:131){latC[i] <- barrios@polygons[[i]]@labpt[2]; lonC[i] <- barrios@polygons[[i]]@labpt[1]}
 centros <- data.frame(lon = lonC, lat = latC, barrio = as.numeric(as.character(barrios$CODBAR)))
 centros <- centros[order(centros$barrio),]
-coordinates(centros) <- ~ lon + lat
-proj4string(centros) <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ")
+# Si quieres dibujarlos...
+# coordinates(centros) <- ~ lon + lat
+# proj4string(centros) <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ")
+# 
+# plot(barrios) 
+# plot(centros, add = TRUE)
 
-plot(barrios) 
-plot(centros, add = TRUE)
-
-# De aquí simplemente se calcula la distancia de un centro con el resto
+# De aquí simplemente se calcula la distancia de un centro con el resto. Hay que hacer la inversa, pues cuanto
+# más cerca más peso debería tener.
 distancias <- distm(centros[, c(1,2)], centros[, c(1,2)])
+distancias_inv <- apply(distancias, 1,function(x) 1/x)
+diag(distancias_inv) <- 0
 
-write.table(distancias, file = "Raw_data/crash_ex_relations.csv", row.names = FALSE, col.names = FALSE)
+write.table(distancias_inv, file = "Raw_data/crash_relations.csv", row.names = FALSE, col.names = FALSE)
