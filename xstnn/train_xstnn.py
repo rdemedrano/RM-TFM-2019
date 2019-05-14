@@ -15,7 +15,7 @@ import torch.backends.cudnn as cudnn
 
 from datasets import dataset_factory
 from utils import DotDict, Logger, rmse
-from xstnn import SaptioTemporalNN
+from xstnn import xSpatioTemporalNN
 
 
 #######################################################################################################################
@@ -108,7 +108,7 @@ nex_dec = idx_dec.size(1)
 #######################################################################################################################
 # Model
 #######################################################################################################################
-model = SaptioTemporalNN(relations, exogenous_train, opt.nx, opt.nt_train, opt.np, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
+model = xSpatioTemporalNN(relations, exogenous_train, opt.nx, opt.nt_train, opt.np, opt.nd, opt.nz, opt.mode, opt.nhid, opt.nlayers,
                          opt.dropout_f, opt.dropout_d, opt.activation, opt.periode).to(device)
 
 
