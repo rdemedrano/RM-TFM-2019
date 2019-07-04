@@ -34,12 +34,12 @@ traffic_int_med <- unique(traffic_int[, c("FECHA", "RANGO HORARIO", "BARRIO", "i
 traffic_int_med$BARRIO <- as.numeric(as.character(traffic_int_med$BARRIO))
 
 
-num_dias = 45
+num_dias = 89
 # Parece ser que hay algunos barrios sin puntos de medida, pero por facilitar las cosas 
 # los ponemos igual y ya se les dará el valor de NA
 num_zonas = 131
 num_horas = num_zonas*24
-fechas_horas_y_zonas <- data.table(FECHA = sort(rep(seq(ymd('2018-01-01'), ymd('2018-02-14'), by = '1 day'), num_horas)),
+fechas_horas_y_zonas <- data.table(FECHA = sort(rep(seq(ymd('2018-01-01'), ymd('2018-03-30'), by = '1 day'), num_horas)),
                                    "RANGO HORARIO" = sort(rep(seq(0,23), num_zonas)),
                                    BARRIO = rep(sort(as.numeric(as.character(barrios$CODBAR))), times = num_dias))
 
