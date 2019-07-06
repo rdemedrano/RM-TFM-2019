@@ -1,3 +1,4 @@
+# EXPERIMENTO FINAL DEL MODELO MEAN
 # Script en el que se calcula el modelo media para los accidentes de tráfico
 
 load("../Accidentes de tráfico - Madrid/Cleaned_data/number_crash.RData")
@@ -9,7 +10,8 @@ normalize <- function(x) {
 number_crash$`Número de accidentes` <- normalize(number_crash$`Número de accidentes`)
 
 # Habrá que hacerlo modelo a modelo, porque para poder evaluar en distintos horarios, no son intervalos temporales iguales
-# o proporcionales.
+# o proporcionales. A su vez, se calcula la realidad de aquel espacio sobre el cual se va a testear. Son 5 timesteps más allá
+# del intervalo entrenado.
 
 medias1 <- number_crash[1:141480]
 medias1[, media_acc := mean(`Número de accidentes`), by = BARRIO]
@@ -111,9 +113,11 @@ gr_truth10 <- gr_truth10[, c("BARRIO") := NULL]
 
 
 
-# Calculamos el error
+# Calculamos el error para cada modelo, y el resultado final. Seguimos por ahora
+# la idea de la STNN. Se calcula el error para acada timestep como la media de errores
+# de cada barrio. El error total es la media de errores para todos los timesteps.
 rmse = function(pred, obs){
-  sqrt(mean((pred - obs)^2))
+  mean(sqrt((pred - obs)^2))
 }
 
 res1 <- 0
@@ -177,7 +181,7 @@ for(i in gr_truth9){
   res9 <- res9 + rmse(medias9$media_acc, i)
 }
 res9 <- res9/5
-
+0
 res10 <- 0
 for(i in gr_truth10){
   res10 <- res10 + rmse(medias10$media_acc, i)
