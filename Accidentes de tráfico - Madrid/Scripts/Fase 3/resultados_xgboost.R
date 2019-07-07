@@ -2,6 +2,8 @@
 
 load("../Accidentes de tráfico - Madrid/Cleaned_data/crash_traffic.RData")
 
+library(data.table)
+
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
@@ -16,7 +18,7 @@ crash_traffic[, FECHA := NULL]
 # num_acc <- num_acc[, -c(6,8,9,10)]
 
 # Dividimos el dataset en dos: uno para el entrenamiento, otro para la validación.
-sample <- seq(1,1146905,1)
+sample <- seq(1,141480,1)
 train <- crash_traffic[sample, ]
 test  <- crash_traffic[-sample, ]
 
@@ -43,36 +45,44 @@ new_ts <- model.matrix(~.+0, data = test[,-c("Número de accidentes"), with=F])
 dtrain <- xgb.DMatrix(data = new_tr , label=labels) 
 dtest <- xgb.DMatrix(data = new_ts , label=ts_label)
 
-# Parámetros del algotitmo
-# params <- list(booster = "gbtree", objective = "reg:linear",
-#                eta=0.08, gamma=2.7, lambda = 1, max_depth=12, min_child_weight=6, subsample=0.7, colsample_bytree=0.9)
-
 # set up the cross-validated hyper-parameter search
-xgb_grid_1 = expand.grid(
-  nrounds = 20, 
-  max_depth = c(5, 10, 15), 
-  eta = c(0.01, 0.001, 0.0001), 
-  gamma = c(1, 2, 3), 
-  colsample_bytree = c(0.4, 0.7, 1.0), 
-  min_child_weight = c(0.5, 1, 1.5)
-)
+# xgb_grid_1 = expand.grid(
+#   nrounds = 20, 
+#   max_depth = c(1, 5, 10, 15, 20),
+#   eta = c(1, 0.1 ,0.01, 0.001, 0.0001), 
+#   gamma = c(0, 1, 2, 3, 4), 
+#   colsample_bytree = c(0.2, 0.4, 0.7, 1.0, 1.5), 
+#   min_child_weight = c(0, 0.5, 1, 1.5, 2),
+#   subsample = c(0.2, 0.5, 0.7, 1, 1.5)
+# )
+# 
+# # pack the training control parameters
+# xgb_trcontrol_1 = trainControl(
+#   method = "cv",
+#   number = 10,  
+#   allowParallel = TRUE
+# )
+# 
+# xgb_train_1 = train(`Número de accidentes` ~ .,
+#   data = train,
+#   trControl = xgb_trcontrol_1,
+#   tuneGrid = xgb_grid_1,
+#   method = "xgbTree"
+# )
 
-# pack the training control parameters
-xgb_trcontrol_1 = trainControl(
-  method = "cv",
-  number = 3,  
-  allowParallel = TRUE
-)
+# Parámetros del algotitmo
+params <- list(booster = "gbtree", objective = "reg:linear",
+                eta=0.08, gamma=2.7, lambda = 1, max_depth=12, min_child_weight=6, colsample_bytree=0.9)
 
 xgb1 <- xgb.train (data = dtrain, nrounds = 70,
-                   trControl = xgb_trcontrol_1,
-                   tuneGrid = xgb_grid_1,
-                   watchlist = list(val=dtest,train=dtrain), verbose = 1, print_every_n = 10, early_stop_round = 10, 
-                   maximize = F , eval_metric = "rmse") # Aunque esto del error lo hace automático al poner regresión creo
+                    params = params,
+                    watchlist = list(val=dtest,train=dtrain), verbose = 1, print_every_n = 10, early_stop_round = 10,
+                    maximize = F , eval_metric = "rmse") # Aunque esto del error lo hace automático al poner regresión creo
+
 
 xgbpred <- predict (xgb1,dtest)
 comparar <- data.table(test$`Número de accidentes`, xgbpred)
 # rmse <- sqrt(1/nrow(test)*sum((xgbpred - test$N)^2))
 
-mat <- xgb.importance (feature_names = colnames(new_tr),model = xgb1)
-xgb.plot.importance (importance_matrix = mat[1:10])
+mat <- xgb.importance(feature_names = colnames(new_tr),model = xgb1)
+xgb.plot.importance(importance_matrix = mat[1:10])
