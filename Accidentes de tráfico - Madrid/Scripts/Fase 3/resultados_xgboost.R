@@ -18,9 +18,9 @@ crash_traffic[, FECHA := NULL]
 # num_acc <- num_acc[, -c(6,8,9,10)]
 
 # Dividimos el dataset en dos: uno para el entrenamiento, otro para la validación.
-sample <- seq(1,141480,1)
-train <- crash_traffic[sample, ]
-test  <- crash_traffic[-sample, ]
+n <- 141480
+train <- crash_traffic[1:n, ]
+test  <- crash_traffic[((n+1):(n+655)), ]
 
 # Ahora hay que pasar a numérico las variables que no lo son. Así, para las que son strings de esta manera
 # puedes crear una variable dummy, es decir, estas nuevas matrices tienen tantas columnas como variables y posibles
@@ -72,9 +72,9 @@ dtest <- xgb.DMatrix(data = new_ts , label=ts_label)
 
 # Parámetros del algotitmo
 params <- list(booster = "gbtree", objective = "reg:linear",
-                eta=0.08, gamma=2.7, lambda = 1, max_depth=12, min_child_weight=6, colsample_bytree=0.9)
+                eta=0.3, gamma=1, lambda = 1, max_depth=15, min_child_weight=1, subsample=0.7)
 
-xgb1 <- xgb.train (data = dtrain, nrounds = 70,
+xgb1 <- xgb.train (data = dtrain, nrounds = 60,
                     params = params,
                     watchlist = list(val=dtest,train=dtrain), verbose = 1, print_every_n = 10, early_stop_round = 10,
                     maximize = F , eval_metric = "rmse") # Aunque esto del error lo hace automático al poner regresión creo
