@@ -4,7 +4,7 @@ load("../Accidentes de tráfico - Madrid/Cleaned_data/number_crash.RData")
 load("../Accidentes de tráfico - Madrid/Cleaned_data/crash_traffic.RData")
 
 
-# 1_ Serie temporal sola.
+# 1_ Serie temporal sola. 
 acc <- number_crash
 acc <- acc[ ,acc := sum(`Número de accidentes`), by = list(FECHA, `RANGO HORARIO`)]
 acc$BARRIO <- NULL
@@ -159,3 +159,19 @@ ggplot(data = acc, aes(x = month(FECHA), y = int, group = month(FECHA))) +
         text = element_text(size=14),
         axis.text.x = element_text(angle=45, hjust=1))
 
+
+
+# 6_ Correlación entre las variables
+library(corrplot)
+acc <- crash_traffic
+acc <- acc[ ,c("int", "acc") := list(mean(int_med), sum(`Número de accidentes`)), by = list(FECHA, `RANGO HORARIO`)]
+acc[, c("BARRIO", "int_med", "Número de accidentes") := NULL]
+acc <- unique(acc)
+colnames(acc)[3:11] <- c("Wind speed","Wind direction", "Temperature",
+                         "Humidity", "Pressure", "Solar radiation", 
+                         "Rainfall", "Traffic intensity", "Number of accidents") 
+
+
+M <- cor(acc[,3:11])
+p.mat <- cor.mtest(acc[,3:11])$p
+corrplot(M[9,-9, drop = FALSE])
