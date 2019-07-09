@@ -122,85 +122,113 @@ rmse = function(pred, obs){
   mean(sqrt((pred - obs)^2))
 }
 
-res1 <- vector()
+bias = function(pred, obs){
+  mean(pred-obs)
+}
+
+rmse1 <- vector()
+bias1 <- vector()
 j <- 1
 for(i in gr_truth1){
-  res1[j] <- rmse(medias1$media_acc, i)
+  rmse1[j] <- rmse(medias1$media_acc, i)
+  bias1[j] <- bias(medias1$media_acc, i)
   j <- j+1
 }
 
 
-res2 <- vector()
+rmse2 <- vector()
+bias2 <- vector()
 j <- 1
 for(i in gr_truth2){
-  res2[j] <- rmse(medias2$media_acc, i)
+  rmse2[j] <- rmse(medias2$media_acc, i)
+  bias2[j] <- bias(medias2$media_acc, i)
   j <- j+1
 }
 
 
-res3 <- vector()
+rmse3 <- vector()
+bias3 <- vector()
 j <- 1
 for(i in gr_truth3){
-  res3[j] <- rmse(medias3$media_acc, i)
+  rmse3[j] <- rmse(medias3$media_acc, i)
+  bias3[j] <- bias(medias3$media_acc, i)
   j <- j+1
 }
 
 
-res4 <- vector()
+rmse4 <- vector()
+bias4 <- vector()
 j <- 1
 for(i in gr_truth4){
-  res4[j] <- rmse(medias4$media_acc, i)
+  rmse4[j] <- rmse(medias4$media_acc, i)
+  bias4[j] <- bias(medias4$media_acc, i)
   j <- j+1
 }
 
 
-res5 <- vector()
+rmse5 <- vector()
+bias5 <- vector()
 j <- 1
 for(i in gr_truth5){
-  res5[j] <- rmse(medias5$media_acc, i)
+  rmse5[j] <- rmse(medias5$media_acc, i)
+  bias5[j] <- bias(medias5$media_acc, i)
   j <- j+1
 }
 
 
-res6 <- vector()
+rmse6 <- vector()
+bias6 <- vector()
 j <- 1
 for(i in gr_truth6){
-  res6 <- rmse(medias6$media_acc, i)
+  rmse6[j] <- rmse(medias6$media_acc, i)
+  bias6[j] <- bias(medias6$media_acc, i)
   j <- j+1
 }
 
 
-res7 <- vector()
+rmse7 <- vector()
+bias7 <- vector()
 j <- 1
 for(i in gr_truth7){
-  res7[j] <- rmse(medias7$media_acc, i)
+  rmse7[j] <- rmse(medias7$media_acc, i)
+  bias7[j] <- bias(medias7$media_acc, i)
   j <- j+1
 }
 
-
+rmse8 <- vector()
+bias8 <- vector()
 j <- 1
 for(i in gr_truth8){
-  res8[j] <- rmse(medias8$media_acc, i)
+  rmse8[j] <- rmse(medias8$media_acc, i)
+  bias8[j] <- bias(medias8$media_acc, i)
   j <- j+1
 }
 
-
+rmse9 <- vector()
+bias9 <- vector()
 j <- 1
 for(i in gr_truth9){
-  res9[j] <- rmse(medias9$media_acc, i)
+  rmse9[j] <- rmse(medias9$media_acc, i)
+  bias9[j] <- bias(medias9$media_acc, i)
   j <- j+1
 }
 
 
-res10 <- vector()
+rmse10 <- vector()
+bias10 <- vector()
 j <- 1
 for(i in gr_truth10){
-  res10[j] <- rmse(medias10$media_acc, i)
+  rmse10[j] <- rmse(medias10$media_acc, i)
+  bias10[j] <- bias(medias10$media_acc, i)
   j <- j+1
 }
 
-rmse_mean <- data.table(res1,res2, res3, res4, res5, res6, res7, res8, res9, res10)
+rmse_mean <- data.table(rmse1,rmse2, rmse3, rmse4, rmse5, rmse6, rmse7, rmse8, rmse9, rmse10)
 rmse_total <- apply(rmse_mean, 2, mean)
 rmse_timestep <- apply(rmse_mean, 1, mean)
-# mean(c(res1, res2, res3, res4, res5, res6, res7, res8, res9, res10))
-# sd(c(res1, res2, res3, res4, res5, res6, res7, res8, res9, res10))
+
+bias_mean <- data.table(bias1,bias2, bias3, bias4, bias5, bias6, bias7, bias8, bias9, bias10)
+bias_total <- apply(bias_mean, 2, mean)
+bias_timestep <- apply(bias_mean, 1, mean)
+# mean(c(rmse1, rmse2, rmse3, rmse4, rmse5, rmse6, rmse7, rmse8, rmse9, rmse10))
+# sd(c(rmse1, rmse2, rmse3, rmse4, rmse5, rmse6, rmse7, rmse8, rmse9, rmse10))
