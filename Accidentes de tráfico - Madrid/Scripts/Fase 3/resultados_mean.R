@@ -3,6 +3,8 @@
 
 load("../Accidentes de tráfico - Madrid/Cleaned_data/number_crash.RData")
 
+library(data.table)
+
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
@@ -120,74 +122,85 @@ rmse = function(pred, obs){
   mean(sqrt((pred - obs)^2))
 }
 
-res1 <- 0
+res1 <- vector()
+j <- 1
 for(i in gr_truth1){
-  res1 <- res1 + rmse(medias1$media_acc, i)
+  res1[j] <- rmse(medias1$media_acc, i)
+  j <- j+1
 }
-res1 <- res1/5
 
 
-res2 <- 0
+res2 <- vector()
+j <- 1
 for(i in gr_truth2){
-  res2 <- res2 + rmse(medias2$media_acc, i)
+  res2[j] <- rmse(medias2$media_acc, i)
+  j <- j+1
 }
-res2 <- res2/5
 
 
-res3 <- 0
+res3 <- vector()
+j <- 1
 for(i in gr_truth3){
-  res3 <- res3 + rmse(medias3$media_acc, i)
+  res3[j] <- rmse(medias3$media_acc, i)
+  j <- j+1
 }
-res3 <- res3/5
 
 
-res4 <- 0
+res4 <- vector()
+j <- 1
 for(i in gr_truth4){
-  res4 <- res4 + rmse(medias4$media_acc, i)
+  res4[j] <- rmse(medias4$media_acc, i)
+  j <- j+1
 }
-res4 <- res4/5
 
 
-res5 <- 0
+res5 <- vector()
+j <- 1
 for(i in gr_truth5){
-  res5 <- res5 + rmse(medias5$media_acc, i)
+  res5[j] <- rmse(medias5$media_acc, i)
+  j <- j+1
 }
-res5 <- res5/5
 
 
-res6 <- 0
+res6 <- vector()
+j <- 1
 for(i in gr_truth6){
-  res6 <- res6 + rmse(medias6$media_acc, i)
+  res6 <- rmse(medias6$media_acc, i)
+  j <- j+1
 }
-res6 <- res6/5
 
 
-res7 <- 0
+res7 <- vector()
+j <- 1
 for(i in gr_truth7){
-  res7 <- res7 + rmse(medias7$media_acc, i)
+  res7[j] <- rmse(medias7$media_acc, i)
+  j <- j+1
 }
-res7 <- res7/5
 
 
-res8 <- 0
+j <- 1
 for(i in gr_truth8){
-  res8 <- res8 + rmse(medias8$media_acc, i)
+  res8[j] <- rmse(medias8$media_acc, i)
+  j <- j+1
 }
-res8 <- res8/5
 
 
-res9 <- 0
+j <- 1
 for(i in gr_truth9){
-  res9 <- res9 + rmse(medias9$media_acc, i)
+  res9[j] <- rmse(medias9$media_acc, i)
+  j <- j+1
 }
-res9 <- res9/5
-0
-res10 <- 0
+
+
+res10 <- vector()
+j <- 1
 for(i in gr_truth10){
-  res10 <- res10 + rmse(medias10$media_acc, i)
+  res10[j] <- rmse(medias10$media_acc, i)
+  j <- j+1
 }
-res10 <- res10/5
 
-
-mean(res1, res2, res3, res4, res5, res6, res7, res8, res9, res10)
-sd(c(res1, res2, res3, res4, res5, res6, res7, res8, res9, res10))
+rmse_mean <- data.table(res1,res2, res3, res4, res5, res6, res7, res8, res9, res10)
+rmse_total <- apply(rmse_mean, 2, mean)
+rmse_timestep <- apply(rmse_mean, 1, mean)
+# mean(c(res1, res2, res3, res4, res5, res6, res7, res8, res9, res10))
+# sd(c(res1, res2, res3, res4, res5, res6, res7, res8, res9, res10))
