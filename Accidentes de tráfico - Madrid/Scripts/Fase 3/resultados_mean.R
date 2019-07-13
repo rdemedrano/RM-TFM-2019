@@ -119,7 +119,11 @@ gr_truth10 <- gr_truth10[, c("BARRIO") := NULL]
 # la idea de la STNN. Se calcula el error para acada timestep como la media de errores
 # de cada barrio. El error total es la media de errores para todos los timesteps.
 rmse = function(pred, obs){
-  mean(sqrt((pred - obs)^2))
+  sqrt(mean((pred - obs)^2))
+}
+
+mae = function(pred, obs){
+  mean(abs(pred-obs))
 }
 
 bias = function(pred, obs){
@@ -127,105 +131,134 @@ bias = function(pred, obs){
 }
 
 rmse1 <- vector()
+mae1 <- vector()
 bias1 <- vector()
 j <- 1
 for(i in gr_truth1){
   rmse1[j] <- rmse(medias1$media_acc, i)
+  mae1[j] <- mae(medias1$media_acc, i)
   bias1[j] <- bias(medias1$media_acc, i)
   j <- j+1
 }
 
 
 rmse2 <- vector()
+mae2 <- vector()
 bias2 <- vector()
 j <- 1
 for(i in gr_truth2){
   rmse2[j] <- rmse(medias2$media_acc, i)
+  mae2[j] <- mae(medias2$media_acc, i)
   bias2[j] <- bias(medias2$media_acc, i)
   j <- j+1
 }
 
 
 rmse3 <- vector()
+mae3 <- vector()
 bias3 <- vector()
 j <- 1
 for(i in gr_truth3){
   rmse3[j] <- rmse(medias3$media_acc, i)
+  mae3[j] <- mae(medias3$media_acc, i)
   bias3[j] <- bias(medias3$media_acc, i)
   j <- j+1
 }
 
 
 rmse4 <- vector()
+mae4 <- vector()
 bias4 <- vector()
 j <- 1
 for(i in gr_truth4){
   rmse4[j] <- rmse(medias4$media_acc, i)
+  mae4[j] <- mae(medias4$media_acc, i)
   bias4[j] <- bias(medias4$media_acc, i)
   j <- j+1
 }
 
 
 rmse5 <- vector()
+mae5 <- vector()
 bias5 <- vector()
 j <- 1
 for(i in gr_truth5){
   rmse5[j] <- rmse(medias5$media_acc, i)
+  mae5[j] <- mae(medias5$media_acc, i)
   bias5[j] <- bias(medias5$media_acc, i)
   j <- j+1
 }
 
 
 rmse6 <- vector()
+mae6 <- vector()
 bias6 <- vector()
 j <- 1
 for(i in gr_truth6){
   rmse6[j] <- rmse(medias6$media_acc, i)
+  mae6[j] <- mae(medias6$media_acc, i)
   bias6[j] <- bias(medias6$media_acc, i)
   j <- j+1
 }
 
 
 rmse7 <- vector()
+mae7 <- vector()
 bias7 <- vector()
 j <- 1
 for(i in gr_truth7){
   rmse7[j] <- rmse(medias7$media_acc, i)
+  mae7[j] <- mae(medias1$media_acc, i)
   bias7[j] <- bias(medias7$media_acc, i)
   j <- j+1
 }
 
 rmse8 <- vector()
+mae8 <- vector()
 bias8 <- vector()
 j <- 1
 for(i in gr_truth8){
   rmse8[j] <- rmse(medias8$media_acc, i)
+  mae8[j] <- mae(medias8$media_acc, i)
   bias8[j] <- bias(medias8$media_acc, i)
   j <- j+1
 }
 
 rmse9 <- vector()
+mae9 <- vector()
 bias9 <- vector()
 j <- 1
 for(i in gr_truth9){
   rmse9[j] <- rmse(medias9$media_acc, i)
+  mae9[j] <- mae(medias9$media_acc, i)
   bias9[j] <- bias(medias9$media_acc, i)
   j <- j+1
 }
 
 
 rmse10 <- vector()
+mae10 <- vector()
 bias10 <- vector()
 j <- 1
 for(i in gr_truth10){
   rmse10[j] <- rmse(medias10$media_acc, i)
+  mae10[j] <- mae(medias10$media_acc, i)
   bias10[j] <- bias(medias10$media_acc, i)
   j <- j+1
 }
 
+
+cal_rmse = function(x){
+  sqrt(mean(x^2))
+}
+
 rmse_mean <- data.table(rmse1,rmse2, rmse3, rmse4, rmse5, rmse6, rmse7, rmse8, rmse9, rmse10)
-rmse_total <- apply(rmse_mean, 2, mean)
-rmse_timestep <- apply(rmse_mean, 1, mean)
+rmse_total <- apply(rmse_mean, 2, cal_rmse)
+rmse_timestep <- apply(rmse_mean, 1, cal_rmse)
+
+mae_mean <- data.table(mae1, mae2, mae3, mae4, mae5, mae6, mae7, mae8, mae9, mae10)
+mae_total <- apply(mae_mean, 2, mean)
+mae_timestep <- apply(mae_mean, 1, mean)
 
 bias_mean <- data.table(bias1,bias2, bias3, bias4, bias5, bias6, bias7, bias8, bias9, bias10)
 bias_total <- apply(bias_mean, 2, mean)
