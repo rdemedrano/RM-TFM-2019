@@ -5,10 +5,24 @@ from collections import defaultdict
 import torch
 
 
+def bias(x_pred, x_target, reduce=True):
+    if reduce:
+        return x_pred.sub(x_target).sum(-1).mean().item()
+    return x_pred.sub(x_target).sum(2).mean(1).squeeze()
+
+
+def mae(x_pred, x_target, reduce=True):
+    if reduce:
+        return x_pred.sub(x_target).abs().sum(-1).mean().item()
+    return x_pred.sub(x_target).abs().sum(2).mean(1).squeeze()
+
+
 def rmse(x_pred, x_target, reduce=True):
     if reduce:
-        return x_pred.sub(x_target).pow(2).sum(-1).sqrt().mean().item()
-    return x_pred.sub(x_target).pow(2).sum(2).sqrt().mean(1).squeeze()
+        # Podría valer con un solo mean(), lo hace igual. Pero para que se entienda
+        # bien
+        return x_pred.sub(x_target).pow(2).mean(1).mean().sqrt().item()
+    return x_pred.sub(x_target).pow(2).mean(1).sqrt().squeeze()
 
 
 def normalize(mx):
