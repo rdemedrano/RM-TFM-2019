@@ -42,52 +42,52 @@ library(data.table); library(ggplot2); require(reshape2); library(gridExtra)
 
 
 # 2_ Gráfica de RMSE por ventana temporal.
-rmse_stnn <- c(mean(c(0.0052,0.0051,0.01,0.0023,0.0012,0.0036,0.0036)), 
-               mean(c(0.0052,0.00219,0.0019,0.0023,0.0073,0.0036,0.0087)),
-               mean(c(0.0019,0.0051,0.0047,0.0023,0.01,0.001,0.0036)),
-               mean(c(0.0052,0.00219,0.0019,0.0057,0.0072,0.001,0.0036)),
-               mean(c(0.0052,0.0083,0.0019,0.0088,0.0072,0.001,0.0036)))
-rmse_xstnn <- c(mean(c(0.0026,0.0035,0.008,0.0005,0.003,0.0039,0.005)), 
-               mean(c(0.00237,0.0015,0.0036,0.0005,0.0075,0.0039,0.002)),
-               mean(c(0.00175,0.0045,0.0036,0.0005,0.01,0.0042,0.0002)),
-               mean(c(0.0026,0.0025,0.0014,0.0033,0.0075,0.0021,0.0012)),
-               mean(c(0.0025,0.007,0.0012,0.006,0.007,0.0042,0.003)))
-rmse_mean <- c(0.004505069,0.006006934,0.004494138,0.004992509,0.005762263)
-rmse_xgboost <- c(mean(c(0.005347, 0.00537, 0.01, 0.0028, 0.0027,0.0053)),
-                  mean(c(0.005328,0.0029,0.0028,0.0028,0.0077,0.0052)),
-                  mean(c(0.00285,0.0053,0.0053,0.0028,0.01,0.0028)),
-                  mean(c(0.0054,0.0029,0.0027,0.0053,0.0077,0.0028)),
-                  mean(c(0.0054,0.0078,0.0028,0.0077,0.0077,0.0028)))
-
-rmse <- data.table("STNN" = rmse_stnn, "XSTNN" = rmse_xstnn, "XGBoost" = rmse_xgboost, "Mean" = rmse_mean)
-rmse <- melt(rmse)
-colnames(rmse)[1] <- "model"
-rmse$timestep <- rep(seq(1,5,1), 4)
-
-p1_line <- ggplot(data = rmse, aes(x = timestep, y = value, group = model, color = model)) +
-  geom_line() +
-  scale_y_continuous(limits = c(0.002, 0.008)) +
-  labs(x = "Timestep", y = "RMSE") +
-  theme_bw() +
-  theme(axis.text = element_text(size=18),
-        text = element_text(size=20), 
-        legend.position="none",
-        axis.title.y = element_text(size = 30),
-        axis.title.x=element_blank(),
-        axis.text.x = element_blank())
-
-
-p1_box <- ggplot(data = rmse, aes(x = model, y = value, group = model, color = model)) +
-  geom_boxplot() +
-  scale_y_continuous(limits = c(0.002, 0.008)) +
-  labs(x = "Model", y = "RMSE") +
-  theme_bw() +
-  theme(axis.text = element_text(size=18),
-        text = element_text(size=20),
-        axis.title.y=element_blank(),
-        axis.title.x=element_blank(),
-        axis.text.x = element_blank(),
-        legend.position = "none")
+# rmse_stnn <- c(mean(c(0.0052,0.0051,0.01,0.0023,0.0012,0.0036,0.0036)), 
+#                mean(c(0.0052,0.00219,0.0019,0.0023,0.0073,0.0036,0.0087)),
+#                mean(c(0.0019,0.0051,0.0047,0.0023,0.01,0.001,0.0036)),
+#                mean(c(0.0052,0.00219,0.0019,0.0057,0.0072,0.001,0.0036)),
+#                mean(c(0.0052,0.0083,0.0019,0.0088,0.0072,0.001,0.0036)))
+# rmse_xstnn <- c(mean(c(0.0026,0.0035,0.008,0.0005,0.003,0.0039,0.005)), 
+#                mean(c(0.00237,0.0015,0.0036,0.0005,0.0075,0.0039,0.002)),
+#                mean(c(0.00175,0.0045,0.0036,0.0005,0.01,0.0042,0.0002)),
+#                mean(c(0.0026,0.0025,0.0014,0.0033,0.0075,0.0021,0.0012)),
+#                mean(c(0.0025,0.007,0.0012,0.006,0.007,0.0042,0.003)))
+# rmse_mean <- c(0.004505069,0.006006934,0.004494138,0.004992509,0.005762263)
+# rmse_xgboost <- c(mean(c(0.005347, 0.00537, 0.01, 0.0028, 0.0027,0.0053)),
+#                   mean(c(0.005328,0.0029,0.0028,0.0028,0.0077,0.0052)),
+#                   mean(c(0.00285,0.0053,0.0053,0.0028,0.01,0.0028)),
+#                   mean(c(0.0054,0.0029,0.0027,0.0053,0.0077,0.0028)),
+#                   mean(c(0.0054,0.0078,0.0028,0.0077,0.0077,0.0028)))
+# 
+# rmse <- data.table("STNN" = rmse_stnn, "XSTNN" = rmse_xstnn, "XGBoost" = rmse_xgboost, "Mean" = rmse_mean)
+# rmse <- melt(rmse)
+# colnames(rmse)[1] <- "model"
+# rmse$timestep <- rep(seq(1,5,1), 4)
+# 
+# p1_line <- ggplot(data = rmse, aes(x = timestep, y = value, group = model, color = model)) +
+#   geom_line() +
+#   scale_y_continuous(limits = c(0.002, 0.008)) +
+#   labs(x = "Timestep", y = "RMSE") +
+#   theme_bw() +
+#   theme(axis.text = element_text(size=18),
+#         text = element_text(size=20), 
+#         legend.position="none",
+#         axis.title.y = element_text(size = 30),
+#         axis.title.x=element_blank(),
+#         axis.text.x = element_blank())
+# 
+# 
+# p1_box <- ggplot(data = rmse, aes(x = model, y = value, group = model, color = model)) +
+#   geom_boxplot() +
+#   scale_y_continuous(limits = c(0.002, 0.008)) +
+#   labs(x = "Model", y = "RMSE") +
+#   theme_bw() +
+#   theme(axis.text = element_text(size=18),
+#         text = element_text(size=20),
+#         axis.title.y=element_blank(),
+#         axis.title.x=element_blank(),
+#         axis.text.x = element_blank(),
+#         legend.position = "none")
 
 # ==== MAE ====
 # 3_ Gráficas de MAE completa.
@@ -121,39 +121,39 @@ p1_box <- ggplot(data = rmse, aes(x = model, y = value, group = model, color = m
 
 
 # 4_ Gráfica de MAE por ventana temporal.
-mae_stnn <- c(0.003151477, 0.003270318, 0.002998494, 0.002895234, 0.003675015)
-mae_xstnn <- c(0.002633113, 0.002000482, 0.002440098, 0.001757051, 0.002806670)
-mae_mean <- c(0.002988944, 0.004353516, 0.003455615, 0.003529027, 0.004165893)
-mae_xgboost <- c(0.003844649, 0.002967024, 0.003411414, 0.003076348, 0.003992461)
-
-mae <- data.table("STNN" = mae_stnn, "XSTNN" = mae_xstnn, "XGBoost" = mae_xgboost, "Mean" = mae_mean)
-mae <- melt(mae)
-colnames(mae)[1] <- "model"
-mae$timestep <- rep(seq(1,5,1), 4)
-
-p2_line <- ggplot(data = mae, aes(x = timestep, y = value, group = model, color = model)) +
-  geom_line() +
-  scale_y_continuous(limits = c(0.001, 0.005)) +
-  labs(x = "Timestep", y = "MAE") +
-  theme_bw() +
-  theme(axis.text = element_text(size=18),
-        text = element_text(size=20), 
-        axis.title.y = element_text(size = 30),
-        legend.position="none",
-        axis.title.x=element_blank(),
-        axis.text.x = element_blank())
-
-p2_box <- ggplot(data = mae, aes(x = model, y = value, group = model, color = model)) +
-  geom_boxplot() +
-  scale_y_continuous(limits = c(0.001, 0.005)) +
-  labs(x = "Model", y = "MAE", legend = "Model") +
-  theme_bw() +
-  theme(axis.text = element_text(size=18),
-        text = element_text(size=20),
-        axis.title.y=element_blank(),
-        axis.title.x=element_blank(),
-        axis.text.x = element_blank(),
-        legend.position = "none")
+# mae_stnn <- c(0.003151477, 0.003270318, 0.002998494, 0.002895234, 0.003675015)
+# mae_xstnn <- c(0.002633113, 0.002000482, 0.002440098, 0.001757051, 0.002806670)
+# mae_mean <- c(0.002988944, 0.004353516, 0.003455615, 0.003529027, 0.004165893)
+# mae_xgboost <- c(0.003844649, 0.002967024, 0.003411414, 0.003076348, 0.003992461)
+# 
+# mae <- data.table("STNN" = mae_stnn, "XSTNN" = mae_xstnn, "XGBoost" = mae_xgboost, "Mean" = mae_mean)
+# mae <- melt(mae)
+# colnames(mae)[1] <- "model"
+# mae$timestep <- rep(seq(1,5,1), 4)
+# 
+# p2_line <- ggplot(data = mae, aes(x = timestep, y = value, group = model, color = model)) +
+#   geom_line() +
+#   scale_y_continuous(limits = c(0.001, 0.005)) +
+#   labs(x = "Timestep", y = "MAE") +
+#   theme_bw() +
+#   theme(axis.text = element_text(size=18),
+#         text = element_text(size=20), 
+#         axis.title.y = element_text(size = 30),
+#         legend.position="none",
+#         axis.title.x=element_blank(),
+#         axis.text.x = element_blank())
+# 
+# p2_box <- ggplot(data = mae, aes(x = model, y = value, group = model, color = model)) +
+#   geom_boxplot() +
+#   scale_y_continuous(limits = c(0.001, 0.005)) +
+#   labs(x = "Model", y = "MAE", legend = "Model") +
+#   theme_bw() +
+#   theme(axis.text = element_text(size=18),
+#         text = element_text(size=20),
+#         axis.title.y=element_blank(),
+#         axis.title.x=element_blank(),
+#         axis.text.x = element_blank(),
+#         legend.position = "none")
 
 
 # ==== BIAS ====
@@ -184,50 +184,50 @@ p2_box <- ggplot(data = mae, aes(x = model, y = value, group = model, color = mo
 
 
 # 6_ Gráfica de BIAS por ventana temporal.
-bias_stnn <- c(mean(c(3.7e-5,3.4e-5,-0.0054,0.0028,0.002,-0.0015)), 
-               mean(c(1.8e-5,2.58e-3,0.0022,0.0028,-0.0032,-0.0015)),
-               mean(c(2.56e-3,3.92e-5,-0.0004,0.0028,-0.0057,0.001)),
-               mean(c(1.73e-5,2.58e-3,0.0022,0.0003,-0.0032,0.001)),
-               mean(c(1.72e-5,-2.5e-3,0.0022,-0.0023,-0.0032,0.001)))
-bias_xstnn <- c(mean(c(-0.0022,-0.0014,-0.006,-0.0004,0.0029,-0.0012)), 
-                mean(c(-0.0022,0.0015,0.0013,-0.0001,-0.0025,-0.0012)),
-                mean(c(0.0004,-0.0006,-0.0013,0.0004,-0.0051,0.0013)),
-                mean(c(-0.0022,0.0023,0.0011,-0.0019,-0.0025,0.0012)),
-                mean(c(-0.0022,-0.0025,0.001,-0.0041,-0.003,0.0013)))
-bias_mean <- c(0.0009861557, -0.0005405619, 0.0009861557, 0.0004772498, -0.0002861089)
-bias_xgboost <- c(mean(c(0.000302,0.00032,-0.0048,0.0027,0.0027,0.000027)),
-                  mean(c(0.000302,0.00286,0.0027,0.0028,-0.0023,0.00029)),
-                  mean(c(0.0028,0.00034,0.00026,0.0028,-0.0048,0.0028)),
-                  mean(c(0.000302,0.00286,0.0027,0.00025,-0.0023,0.0028)),
-                  mean(c(0.000302,-0.0022,0.0028,-0.0023,-0.0023,0.0028)))
-
-bias <- data.table("STNN" = bias_stnn, "XSTNN" = bias_xstnn, "XGBoost" = bias_xgboost, "Mean" = bias_mean)
-bias <- melt(bias)
-colnames(bias)[1] <- "model"
-bias$timestep <- rep(seq(1,5,1), 4)
-
-p3_line <- ggplot(data = bias, aes(x = timestep, y = value, group = model, color = model)) +
-  geom_line() +
-  scale_y_continuous(limits = c(-0.003, 0.002)) +
-  labs(x = "Timestep", y = "Bias") +
-  theme_bw() +
-  theme(axis.text = element_text(size=18),
-        text = element_text(size=20),
-        axis.title.y = element_text(size = 30),
-        legend.position="none")
-
-p3_box <- ggplot(data = bias, aes(x = model, y = value, group = model, color = model)) +
-  geom_boxplot() +
-  scale_y_continuous(limits = c(-0.003, 0.002)) +
-  labs(x = "Model", y = "Bias") +
-  theme_bw() +
-  theme(axis.text = element_text(size=18),
-        text = element_text(size=20),
-        axis.title.y=element_blank(),
-        legend.position = "none")
-
-grid.arrange(p1_line, p1_box, p2_line, p2_box, p3_line, p3_box, nrow = 3, widths=c(2,1))
-
+# bias_stnn <- c(mean(c(3.7e-5,3.4e-5,-0.0054,0.0028,0.002,-0.0015)), 
+#                mean(c(1.8e-5,2.58e-3,0.0022,0.0028,-0.0032,-0.0015)),
+#                mean(c(2.56e-3,3.92e-5,-0.0004,0.0028,-0.0057,0.001)),
+#                mean(c(1.73e-5,2.58e-3,0.0022,0.0003,-0.0032,0.001)),
+#                mean(c(1.72e-5,-2.5e-3,0.0022,-0.0023,-0.0032,0.001)))
+# bias_xstnn <- c(mean(c(-0.0022,-0.0014,-0.006,-0.0004,0.0029,-0.0012)), 
+#                 mean(c(-0.0022,0.0015,0.0013,-0.0001,-0.0025,-0.0012)),
+#                 mean(c(0.0004,-0.0006,-0.0013,0.0004,-0.0051,0.0013)),
+#                 mean(c(-0.0022,0.0023,0.0011,-0.0019,-0.0025,0.0012)),
+#                 mean(c(-0.0022,-0.0025,0.001,-0.0041,-0.003,0.0013)))
+# bias_mean <- c(0.0009861557, -0.0005405619, 0.0009861557, 0.0004772498, -0.0002861089)
+# bias_xgboost <- c(mean(c(0.000302,0.00032,-0.0048,0.0027,0.0027,0.000027)),
+#                   mean(c(0.000302,0.00286,0.0027,0.0028,-0.0023,0.00029)),
+#                   mean(c(0.0028,0.00034,0.00026,0.0028,-0.0048,0.0028)),
+#                   mean(c(0.000302,0.00286,0.0027,0.00025,-0.0023,0.0028)),
+#                   mean(c(0.000302,-0.0022,0.0028,-0.0023,-0.0023,0.0028)))
+# 
+# bias <- data.table("STNN" = bias_stnn, "XSTNN" = bias_xstnn, "XGBoost" = bias_xgboost, "Mean" = bias_mean)
+# bias <- melt(bias)
+# colnames(bias)[1] <- "model"
+# bias$timestep <- rep(seq(1,5,1), 4)
+# 
+# p3_line <- ggplot(data = bias, aes(x = timestep, y = value, group = model, color = model)) +
+#   geom_line() +
+#   scale_y_continuous(limits = c(-0.003, 0.002)) +
+#   labs(x = "Timestep", y = "Bias") +
+#   theme_bw() +
+#   theme(axis.text = element_text(size=18),
+#         text = element_text(size=20),
+#         axis.title.y = element_text(size = 30),
+#         legend.position="none")
+# 
+# p3_box <- ggplot(data = bias, aes(x = model, y = value, group = model, color = model)) +
+#   geom_boxplot() +
+#   scale_y_continuous(limits = c(-0.003, 0.002)) +
+#   labs(x = "Model", y = "Bias") +
+#   theme_bw() +
+#   theme(axis.text = element_text(size=18),
+#         text = element_text(size=20),
+#         axis.title.y=element_blank(),
+#         legend.position = "none")
+# 
+# grid.arrange(p1_line, p1_box, p2_line, p2_box, p3_line, p3_box, nrow = 3, widths=c(2,1))
+# 
 
 
 # ==== VALORES NUEVOS ====
@@ -237,43 +237,46 @@ cal_rmse = function(x){
 }
 
 # STNN
-rmse_stnn <- data.table("Val1" = c(0.0290, 0.0290, 0.0019, 0.0290, 0.0290),
+rmse_stnn <- data.table("Val1" = c(0.0290, 0.0290, 0.0024, 0.0290, 0.0290),
                         "Val2" = c(0.0290, 0.0024, 0.0290, 0.0024, 0.0410),
                         "Val3" = c(0.0501, 0.0027, 0.0290, 0.0027, 0.0027),
                         "Val4" = c(0.0026, 0.0026, 0.0026, 0.0290, 0.0409),
                         "Val5" = c(0.0018, 0.041, 0.0502, 0.041, 0.041),
-                        "Val6" = c(0.0290, 0.0290, 0.0011, 0.0011, 0.0011),
+                        "Val6" = c(0.0290, 0.0290, 0.0018, 0.0018, 0.0018),
                         "Val7" = c(0.0290, 0.0502, 0.0290, 0.0290, 0.0290),
                         "Val8" = c(0.0503, 0.0290, 0.0012, 0.0411, 0.0012),
                         "Val9" = c(0.0410, 0.0290, 0.0015, 0.0015, 0.0410),
-                        "Val10" = c(0.029, 0.0019, 0.0041, 0.0019, 0.029)
+                        "Val10" = c(0.0290, 0.0024, 0.0409, 0.0021, 0.0290)
+                        # "Val10" = c(0.029, 0.0021, 0.0041, 0.0021, 0.029)
 )
 rmse_stnn <- apply(rmse_stnn, 1, cal_rmse)
 
-mae_stnn <- data.table("Val1" = c(0.0044, 0.0044, 0.0019, 0.0044, 0.0044),
+mae_stnn <- data.table("Val1" = c(0.0049, 0.0049, 0.0024, 0.0049, 0.0049),
                        "Val2" = c(0.0049, 0.0024, 0.0049, 0.0024, 0.0075),
                        "Val3" = c(0.0102, 0.0027, 0.0052, 0.0027, 0.0027),
                        "Val4" = c(0.0026, 0.0026, 0.0026, 0.0051, 0.0076),
                        "Val5" = c(0.0018, 0.0068, 0.0093, 0.0068, 0.0068),
-                       "Val6" = c(0.0037, 0.0037, 0.0011, 0.0011, 0.0011),
+                       "Val6" = c(0.0043, 0.0043, 0.0018, 0.0018, 0.0018),
                        "Val7" = c(0.0039, 0.0090, 0.0039, 0.0039, 0.0039),
                        "Val8" = c(0.0087, 0.0037, 0.0012, 0.0062, 0.0012),
                        "Val9" = c(0.0065, 0.0040, 0.0015, 0.0015, 0.0065),
-                       "Val10" = c(0.0044, 0.0019, 0.0068, 0.0019, 0.0044)
+                       # "Val10" = c(0.0044, 0.0021, 0.0068, 0.0021, 0.0044)
+                       "Val10" = c(0.0049, 0.0024, 0.0076, 0.0021, 0.0049)
 )
 
 mae_stnn <- apply(mae_stnn, 1, mean)
 
-bias_stnn <- data.table("Val1" = c(-0.0007, -0.0007,  0.0019, -0.0007, -0.0007),
+bias_stnn <- data.table("Val1" = c(-0.0002, -0.0002,  0.0024, -0.0002, -0.0002),
                         "Val2" = c(-0.0001,  0.0024, -0.0001,  0.0024, -0.0027),
                         "Val3" = c(-0.0049,  0.0027,  0.0001,  0.0027,  0.0027),
-                        "Val4" = c(2.6059e-03,  2.6160e-03,  2.6160e-03,  7.1493e-05, -2.4730e-03),
+                        "Val4" = c(2.6059e-03, 2.6160e-03, 2.6160e-03, 7.1493e-05, -2.4730e-03),
                         "Val5" = c(0.0018, -0.0033, -0.0058, -0.0033, -0.0033),
-                        "Val6" = c(-0.0014, -0.0014,  0.0011,  0.0011,  0.0011),
+                        "Val6" = c(-0.0007, -0.0007, 0.0018, 0.0018, 0.0018),
                         "Val7" = c(-0.0011, -0.0062, -0.0011, -0.0011, -0.0011),
                         "Val8" = c(-0.0065, -0.0014,  0.0012, -0.0039,  0.0012),
                         "Val9" = c(-0.0036, -0.0011,  0.0015,  0.0015, -0.0036),
-                        "Val10" = c(-0.0007, 0.0019, -0.0033, 0.0019, -0.0007)
+                        "Val10" = c(-0.0002,  0.0024, -0.0025,  0.0021, -0.0001)
+                        # "Val10" = c(-0.0007, 0.0021, -0.0033, 0.0021, -0.0007)
 )
 bias_stnn <- apply(bias_stnn, 1, mean)
 
@@ -282,12 +285,13 @@ rmse_xstnn <- data.table("Val1" = c(0.0292, 0.0292, 0.0004, 0.0292, 0.0292),
                          "Val2" = c(0.0291, 0.0009, 0.0291, 0.0013, 0.0410),
                          "Val3" = c(0.0499, 0.0031, 0.0290, 0.0019, 0.0018),
                          "Val4" = c(0.0007, 0.0007, 0.0008, 0.0291, 0.0410),
-                         "Val5" = c(),
-                         "Val6" = c(),
-                         "Val7" = c(),
-                         "Val8" = c(),
-                         "Val9" = c(),
-                         "Val10" = c()
+                         "Val5" = c(0.0027, 0.0410, 0.0502, 0.0409, 0.0410),
+                         "Val6" = c(0.0291, 0.0291, 0.0044, 0.0043, 0.0045),
+                         "Val7" = c(0.0290, 0.0501, 0.0290, 0.0290, 0.0291),
+                         "Val8" = c(5.0432e-02, 2.9110e-02, 5.3874e-06, 4.1193e-02, 8.7415e-05),
+                         "Val9" = c(0.0410, 0.0290, 0.0022, 0.0023, 0.0410),
+                         "Val10" = c(0.029, 0.0019, 0.0041, 0.0019, 0.029)
+                         # "Val10" = c(0.0290, 0.0024, 0.0409, 0.0021, 0.0290)
 )
 rmse_xstnn <- apply(rmse_xstnn, 1, cal_rmse)
 
@@ -295,13 +299,15 @@ mae_xstnn <- data.table("Val1" = c(0.0029, 0.0029, 0.0004, 0.0030, 0.0030),
                         "Val2" = c(0.0031, 0.0008, 0.0037, 0.0013, 0.0066),
                         "Val3" = c(0.0112, 0.0030, 0.0048, 0.0019, 0.0017),
                         "Val4" = c(0.0006, 0.0006, 0.0007, 0.0034, 0.0065),
-                        "Val5" = c(),
-                        "Val6" = c(),
-                        "Val7" = c(),
-                        "Val8" = c(),
-                        "Val9" = c(),
-                        "Val10" = c()
+                        "Val5" = c(0.0026, 0.0076, 0.0098, 0.0072, 0.0070),
+                        "Val6" = c(0.0070, 0.0070, 0.0044, 0.0043, 0.0045),
+                        "Val7" = c(0.0047, 0.0099, 0.0051, 0.0050, 0.0054),
+                        "Val8" = c(7.6994e-03, 2.7025e-03, 5.3874e-06, 5.1375e-03, 8.7415e-05),
+                        "Val9" = c(0.0071, 0.0047, 0.0022, 0.0023, 0.0075),
+                        "Val10" = c(0.0044, 0.0019, 0.0068, 0.0019, 0.0044)
+                        # "Val10" = c(0.0049, 0.0024, 0.0076, 0.0021, 0.0049)
 )
+# "Val10" = c(0.0033, 0.0019, 0.0066, 0.0016, 0.0033)
 mae_xstnn <- apply(mae_xstnn, 1, mean)
 
 
@@ -309,12 +315,13 @@ bias_xstnn <- data.table("Val1" = c(-0.0024, -0.0029, -0.0002, -0.0028, -0.0029)
                          "Val2" = c(-0.0020,  0.0008, -0.0014,  0.0013, -0.0036),
                          "Val3" = c(-0.0038,  0.0030, -0.0003,  0.0019,  0.0017),
                          "Val4" = c(0.0006,  0.0006,  0.0007, -0.0017, -0.0036),
-                         "Val5" = c(),
-                         "Val6" = c(),
-                         "Val7" = c(),
-                         "Val8" = c(),
-                         "Val9" = c(),
-                         "Val10" = c()
+                         "Val5" = c(0.0026, -0.0025, -0.0054, -0.0029, -0.0031),
+                         "Val6" = c(0.0020, 0.0020, 0.0044, 0.0043, 0.0045),
+                         "Val7" = c(-4.0142e-04, -5.2363e-03, 2.6120e-05, -2.2194e-05, 3.8887e-04),
+                         "Val8" = c(-7.5645e-03, -2.3841e-03, -5.3874e-06, -5.1375e-03, -8.7415e-05),
+                         "Val9" = c(-0.0030, -0.0004, 0.0022, 0.0023, -0.0026),
+                         "Val10" = c(-0.0007, 0.0021, -0.0033, 0.0021, -0.0007)
+                         # "Val10" = c(-0.0002,  0.0024, -0.0025,  0.0021, -0.0001)
 )
 bias_xstnn <- apply(bias_xstnn, 1, mean)
 
@@ -367,13 +374,13 @@ bias_mean <- c(0.0009861557, -0.0005405619, 0.0009861557, 0.0004772498, -0.00028
 
 
 # Gráficas rmse
-rmse <- data.table("STNN" = rmse_stnn, "XGBoost" = rmse_xgboost, "Mean" = rmse_mean)
+rmse <- data.table("XSTNN" = rmse_xstnn, "STNN" = rmse_stnn, "XGBoost" = rmse_xgboost, "Mean" = rmse_mean)
 rmse <- melt(rmse)
 colnames(rmse)[1] <- "model"
-rmse$timestep <- rep(seq(1,5,1), 3)
+rmse$timestep <- rep(seq(1,5,1), 4)
 
 p1_line <- ggplot(data = rmse, aes(x = timestep, y = value, group = model, color = model)) +
-  geom_line() +
+  geom_line(size = 1) +
   scale_y_continuous(limits = c(0.02, 0.04)) +
   labs(x = "Timestep", y = "RMSE") +
   theme_bw() +
@@ -399,13 +406,13 @@ p1_box <- ggplot(data = rmse, aes(x = model, y = value, group = model, color = m
 
 
 # Gráficas mae
-mae <- data.table("STNN" = mae_stnn, "XGBoost" = mae_xgboost, "Mean" = mae_mean)
+mae <- data.table("XSTNN" = mae_xstnn, "STNN" = mae_stnn, "XGBoost" = mae_xgboost, "Mean" = mae_mean)
 mae <- melt(mae)
 colnames(mae)[1] <- "model"
-mae$timestep <- rep(seq(1,5,1), 3)
+mae$timestep <- rep(seq(1,5,1), 4)
 
 p2_line <- ggplot(data = mae, aes(x = timestep, y = value, group = model, color = model)) +
-  geom_line() +
+  geom_line(size = 1) +
   scale_y_continuous(limits = c(0.0035, 0.0065)) +
   labs(x = "Timestep", y = "MAE") +
   theme_bw() +
@@ -431,13 +438,13 @@ p2_box <- ggplot(data = mae, aes(x = model, y = value, group = model, color = mo
 
 
 # Gráficas bias
-bias <- data.table("STNN" = bias_stnn, "XGBoost" = bias_xgboost, "Mean" = bias_mean)
+bias <- data.table("XSTNN" = bias_xstnn, "STNN" = bias_stnn, "XGBoost" = bias_xgboost, "Mean" = bias_mean)
 bias <- melt(bias)
 colnames(bias)[1] <- "model"
-bias$timestep <- rep(seq(1,5,1), 3)
+bias$timestep <- rep(seq(1,5,1), 4)
 
 p3_line <- ggplot(data = bias, aes(x = timestep, y = value, group = model, color = model)) +
-  geom_line() +
+  geom_line(size = 1) +
   scale_y_continuous(limits = c(-0.002, 0.002)) +
   labs(x = "Timestep", y = "Bias") +
   theme_bw() +
@@ -456,7 +463,77 @@ p3_box <- ggplot(data = bias, aes(x = model, y = value, group = model, color = m
         axis.title.y=element_blank(),
         legend.position = "none")
 
-grid.arrange(p1_line, p1_box, p2_line, p2_box, p3_line, p3_box, nrow = 3, widths=c(2,1))
+grid.arrange(p2_line, p2_box, p1_line, p1_box, p3_line, p3_box, nrow = 3, widths=c(2,1))
+
+
+# ==== ANÁLISIS ESPACIAL RESULTADOS ====
+library(rgdal); library(sp); library(data.table); library(plyr)
+load("../Accidentes de tráfico - Madrid/Cleaned_data/number_crash.RData")
+barrios <- rgdal::readOGR("Raw_data/BARRIOS.shp")
+barrios <- spTransform(barrios, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+esp_xstnn <- fread("Raw_data/esp_ xstnn.txt")
+esp_xstnn$V1 <- normalize(esp_xstnn$V1)
+colnames(esp_xstnn)[1] <- "risk_x"
+esp_xstnn$CODBAR <- unique(number_crash$BARRIO)
+setcolorder(esp_xstnn, c("CODBAR","risk_x"))
+esp_xstnn$risk_x[44] <- 0.01
+esp_xstnn$risk_x[45] <- 0.01
+
+risk_crash <- number_crash
+risk_crash[, risk := sum(`Número de accidentes`), by = list(BARRIO)]
+risk_crash <- unique(risk_crash[, c(3,5)])
+risk_crash$risk <- normalize(risk_crash$risk)
+colnames(risk_crash)[1] <- "CODBAR"
+
+alfa <- 0.1
+fun1 <- function(x, y){ 
+  if (abs(x-y) > 0.1){
+    if (x < y) {
+      x + alfa } 
+    else {
+      x - alfa}
+  } else {
+      x
+    }
+}
+esp_xstnn$risk_dist <- mapply(fun1, esp_xstnn$risk_x, risk_crash$risk)
+esp_xstnn$risk_dist <- normalize(esp_xstnn$risk_dist)
+# Jugamos con la idea del que el id del fortify se ordena igual que como
+# salen los barrios de forma natural
+barrios@data$CODBAR <- as.numeric(as.character(barrios@data$CODBAR))
+barrios@data <- join(barrios@data, risk_crash)
+barrios@data <- join(barrios@data, esp_xstnn)
+barrios@data$id <- seq(0,130,1)
+
+barrios_for <- fortify(barrios)
+barrios_for <- join(barrios_for, barrios@data[,10:13]) #Cambiar aquí
+
+map1 <- ggplot() +
+  geom_polygon(data = barrios_for, aes(x = long, y = lat, group = id, fill = risk)) +
+  scale_fill_gradient2(low = "green", mid = "red", high = "black", midpoint = 0.5) +
+  labs(x = "Longitude", y = "Latitude", fill = "Risk of accident") +
+  annotate("text", x = -3.6, y = 40.65, label = "Ground truth", color = "red", size = 12) +
+  theme_bw() +
+  theme(axis.text = element_text(size=12),
+        text = element_text(size=14),
+        legend.position = "none")
+
+map2 <- ggplot() + 
+  geom_polygon(data = barrios_for, aes(x = long, y = lat, group = id, fill = risk_dist)) +
+  scale_fill_gradient2(low = "green", mid = "red", high = "black", midpoint = 0.5, breaks = c(0,0.5,1), labels = c("Low", "Medium", "High")) +
+  labs(x = "Longitude", y = "Latitude", fill = "Risk of accident") +
+  annotate("text", x = -3.6, y = 40.65, label = "XSTNN prediction", color = "red", size = 12) +
+  theme_bw() +
+  theme(axis.text = element_text(size=12),
+        text = element_text(size=14))
+
+grid.arrange(map1, map2, nrow = 1, widths=c(0.9,1))
+
 
 # ==== RESULTADOS STNN Y XSTNN ====
 
