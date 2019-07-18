@@ -18,7 +18,7 @@ crash_traffic[, FECHA := NULL]
 # num_acc <- num_acc[, -c(6,8,9,10)]
 
 # Dividimos el dataset en dos: uno para el entrenamiento, otro para la validación.
-n <- 141480
+n <- 1146905
 train <- crash_traffic[1:n, ]
 test  <- crash_traffic[((n+1):(n+655)), ]
 
@@ -79,10 +79,46 @@ xgb1 <- xgb.train (data = dtrain, nrounds = 60,
                     watchlist = list(val=dtest,train=dtrain), verbose = 1, print_every_n = 10, early_stop_round = 10,
                     maximize = F , eval_metric = "rmse") # Aunque esto del error lo hace automático al poner regresión creo
 
+# Calculamos el error para cada modelo, y el resultado final. Seguimos por ahora
+# la idea de la STNN. Se calcula el error para acada timestep como la media de errores
+# de cada barrio. El error total es la media de errores para todos los timesteps.
+rmse = function(pred, obs){
+  sqrt(mean((pred - obs)^2))
+}
+
+mae = function(pred, obs){
+  mean(abs(pred-obs))
+}
+
+bias = function(pred, obs){
+  mean(pred-obs)
+}
 
 xgbpred <- predict (xgb1,dtest)
-comparar <- data.table(test$`Número de accidentes`, xgbpred)
-# rmse <- sqrt(1/nrow(test)*sum((xgbpred - test$N)^2))
 
-mat <- xgb.importance(feature_names = colnames(new_tr),model = xgb1)
-xgb.plot.importance(importance_matrix = mat[1:10])
+
+rmse <- c(rmse(xgbpred[1:131], test$`Número de accidentes`[1:131]), 
+          rmse(xgbpred[131:(2*131)], test$`Número de accidentes`[131:(2*131)]),
+          rmse(xgbpred[(2*131):(3*131)], test$`Número de accidentes`[(2*131):(3*131)]),
+          rmse(xgbpred[(3*131):(4*131)], test$`Número de accidentes`[(3*131):(4*131)]),
+          rmse(xgbpred[(4*131):(5*131)], test$`Número de accidentes`[(4*131):(5*131)]))
+
+mae <- c(mae(xgbpred[1:131], test$`Número de accidentes`[1:131]),
+          mae(xgbpred[131:(2*131)], test$`Número de accidentes`[131:(2*131)]),
+          mae(xgbpred[(2*131):(3*131)], test$`Número de accidentes`[(2*131):(3*131)]),
+          mae(xgbpred[(3*131):(4*131)], test$`Número de accidentes`[(3*131):(4*131)]),
+          mae(xgbpred[(4*131):(5*131)], test$`Número de accidentes`[(4*131):(5*131)]))
+
+bias <- c(bias(xgbpred[1:131], test$`Número de accidentes`[1:131]),
+          bias(xgbpred[131:(2*131)], test$`Número de accidentes`[131:(2*131)]),
+          bias(xgbpred[(2*131):(3*131)], test$`Número de accidentes`[(2*131):(3*131)]),
+          bias(xgbpred[(3*131):(4*131)], test$`Número de accidentes`[(3*131):(4*131)]),
+          bias(xgbpred[(4*131):(5*131)], test$`Número de accidentes`[(4*131):(5*131)]))
+
+
+cal_rmse = function(x){
+  sqrt(mean(x^2))
+}
+
+# mat <- xgb.importance(feature_names = colnames(new_tr),model = xgb1)
+# xgb.plot.importance(importance_matrix = mat[1:10])

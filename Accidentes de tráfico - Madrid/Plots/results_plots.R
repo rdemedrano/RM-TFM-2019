@@ -466,17 +466,35 @@ p3_box <- ggplot(data = bias, aes(x = model, y = value, group = model, color = m
 grid.arrange(p2_line, p2_box, p1_line, p1_box, p3_line, p3_box, nrow = 3, widths=c(2,1))
 
 
+
+
+# ==== DIAGRAMA DE RIESGOS REAL ====
+load("../Accidentes de tráfico - Madrid/Cleaned_data/number_crash.RData")
+
+risk_crash <- number_crash
+risk_crash[, risk := sum(`Número de accidentes`), by = list(BARRIO)]
+risk_crash <- unique(risk_crash[, c(3,5)])
+risk_crash$risk <- normalize(risk_crash$risk)
+colnames(risk_crash)[1] <- "CODBAR"
+
+ggplot(data = risk_crash, aes(x = 1, y = seq(1,131,1), fill = risk)) +
+  geom_tile() + 
+  scale_fill_gradient2(low = "blue", mid = "green", high = "red", midpoint = 0.5) +
+  scale_y_reverse(limits = c(131, 1), breaks = seq(130, 0, -5))
+
+
+
 # ==== ANÁLISIS ESPACIAL RESULTADOS ====
 library(rgdal); library(sp); library(data.table); library(plyr)
 load("../Accidentes de tráfico - Madrid/Cleaned_data/number_crash.RData")
-barrios <- rgdal::readOGR("Raw_data/BARRIOS.shp")
-barrios <- spTransform(barrios, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
-
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-esp_xstnn <- fread("Raw_data/esp_ xstnn.txt")
+barrios <- rgdal::readOGR("Raw_data/BARRIOS.shp")
+barrios <- spTransform(barrios, CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+
+esp_xstnn <- fread("Raw_data/esp_xstnn2.txt")
 esp_xstnn$V1 <- normalize(esp_xstnn$V1)
 colnames(esp_xstnn)[1] <- "risk_x"
 esp_xstnn$CODBAR <- unique(number_crash$BARRIO)
@@ -491,10 +509,10 @@ risk_crash$risk <- normalize(risk_crash$risk)
 colnames(risk_crash)[1] <- "CODBAR"
 
 alfa <- 0.1
-fun1 <- function(x, y){ 
+fun1 <- function(x, y){
   if (abs(x-y) > 0.1){
     if (x < y) {
-      x + alfa } 
+      x + alfa }
     else {
       x - alfa}
   } else {
@@ -516,21 +534,20 @@ barrios_for <- join(barrios_for, barrios@data[,10:13]) #Cambiar aquí
 map1 <- ggplot() +
   geom_polygon(data = barrios_for, aes(x = long, y = lat, group = id, fill = risk)) +
   scale_fill_gradient2(low = "green", mid = "red", high = "black", midpoint = 0.5) +
-  labs(x = "Longitude", y = "Latitude", fill = "Risk of accident") +
-  annotate("text", x = -3.6, y = 40.65, label = "Ground truth", color = "red", size = 12) +
+  labs(x = "Longitude", y = "Latitude", fill = "Risk of accident", title = "Ground truth") +
   theme_bw() +
-  theme(axis.text = element_text(size=12),
-        text = element_text(size=14),
+  theme(axis.text = element_text(size=16),
+        text = element_text(size=18),
         legend.position = "none")
 
 map2 <- ggplot() + 
   geom_polygon(data = barrios_for, aes(x = long, y = lat, group = id, fill = risk_dist)) +
   scale_fill_gradient2(low = "green", mid = "red", high = "black", midpoint = 0.5, breaks = c(0,0.5,1), labels = c("Low", "Medium", "High")) +
-  labs(x = "Longitude", y = "Latitude", fill = "Risk of accident") +
-  annotate("text", x = -3.6, y = 40.65, label = "XSTNN prediction", color = "red", size = 12) +
+  labs(x = "Longitude", y = "Latitude", fill = "Risk of accident", title = "XSTNN prediction") +
   theme_bw() +
-  theme(axis.text = element_text(size=12),
-        text = element_text(size=14))
+  theme(axis.text = element_text(size=16),
+        text = element_text(size=18),
+        axis.title.y = element_blank())
 
 grid.arrange(map1, map2, nrow = 1, widths=c(0.9,1))
 
