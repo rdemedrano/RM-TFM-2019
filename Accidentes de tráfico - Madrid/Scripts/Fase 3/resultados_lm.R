@@ -12,7 +12,7 @@ crash_traffic[,c(4:12)] <- as.data.table(lapply(crash_traffic[,c(4:12)], normali
 crash_traffic$`DIA SEMANA` <- weekdays(crash_traffic$FECHA)
 
 # Datos de entrenamiento 
-n <- 1146905
+n <- 931672
 train <- crash_traffic[1:n, ]
 test  <- crash_traffic[((n+1):(n+655)), ]
 

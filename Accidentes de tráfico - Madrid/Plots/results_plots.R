@@ -367,6 +367,47 @@ bias_xgboost <- data.table("Val1" = c(0.0002832960, 0.0003025727, 0.0028278253, 
 bias_xgboost <- apply(bias_xgboost, 1, mean)
 
 
+# Linear
+rmse_linear <- data.table("Val1" = c(0.0291345290, 0.0290254015, 0.0008103509, 0.0290023265, 0.0289019076),
+                           "Val2" = c(0.029078677, 0.003488276, 0.028939354, 0.004465410, 0.040682750),
+                           "Val3" = c(0.0498466346, 0.0039808258, 0.0289178842, 0.0037150634, 0.0006621078),
+                           "Val4" = c(0.001291164, 0.001590788, 0.001778313, 0.028931242, 0.040819201),
+                           "Val5" = c(0.005339589, 0.040816840, 0.049781338, 0.040559203, 0.040876282),
+                           "Val6" = c(0.029060394, 0.028955545, 0.001083109, 0.000996243, 0.001312051),
+                           "Val7" = c(0.02893390, 0.04985217, 0.02902242, 0.02891631, 0.02894309),
+                           "Val8" = c(0.0500853917, 0.0289055324, 0.0006650560, 0.0409148239, 0.0008395977),
+                           "Val9" = c(0.040906978, 0.028951207, 0.002953416, 0.003228784, 0.040769696),
+                           "Val10" = c(0.029140932, 0.003643373, 0.040664103, 0.003501062, 0.028946070)
+)
+rmse_linear <- apply(rmse_linear, 1, cal_rmse)
+
+mae_linear <- data.table("Val1" = c(0.0030586097, 0.0031834083, 0.0007257864, 0.0033288750, 0.0035052685),
+                          "Val2" = c(0.005161144, 0.003417861, 0.006360915, 0.004365873, 0.009205395),
+                          "Val3" = c(0.0115318259, 0.0038518082, 0.0062028129, 0.0036782622, 0.0004489833),
+                          "Val4" = c(0.001202760, 0.001521915, 0.001712538, 0.004575498, 0.007734925),
+                          "Val5" = c(0.005241487, 0.009902701, 0.012584548, 0.009418959, 0.009119770),
+                          "Val6" = c(0.0034587230, 0.0034963414, 0.0010314655, 0.0009413744, 0.0012659922),
+                          "Val7" = c(0.005814358, 0.010972519, 0.006107112, 0.006471368, 0.006422517),
+                          "Val8" = c(0.0095409365, 0.0046975247, 0.0005613041, 0.0056911736, 0.0007290579),
+                          "Val9" = c(0.007411099, 0.005074941, 0.002877640, 0.003155724, 0.008508554),
+                          "Val10" = c(0.005787552, 0.003524259, 0.007901496, 0.003439362, 0.005444935)
+)
+mae_linear <- apply(mae_linear, 1, mean)
+
+bias_linear <- data.table("Val1" = c(-0.0020646630, -0.0018699637, 0.0007257864, -0.0017174807, -0.0015226059),
+                           "Val2" = c(0.0001017707, 0.0034178611, 0.0013707315, 0.0043658733, -0.0007518817),
+                           "Val3" = c(-3.499976e-03, 3.851808e-03, 1.211914e-03, 3.678262e-03, 5.977758e-05),
+                           "Val4" = c(0.001202760, 0.001521915, 0.001712538, -0.000447000, -0.002290128),
+                           "Val5" = c(5.241487e-03, -6.794345e-05, -2.339708e-03, -5.005405e-04, -8.881590e-04),
+                           "Val6" = c(-0.0016163238, -0.0015409056, 0.0010314655, 0.0009413744, 0.0012659922),
+                           "Val7" = c(0.0007932844, -0.0040193895, 0.0010961785, 0.0014880752, 0.0014327488),
+                           "Val8" = c(-0.0056041188, -0.0003177805, 0.0005408005, -0.0043837950, 0.0007284502),
+                           "Val9" = c(-2.679536e-03, 5.641198e-05, 2.877640e-03, 3.155724e-03, -1.488915e-03),
+                           "Val10" = c(0.0007296724, 0.0035242594, -0.0020811036, 0.0034393617, 0.0004334285)
+)
+bias_linear <- apply(bias_linear, 1, mean)
+
+
 # Mean
 rmse_mean <- c(0.02430031, 0.03303221, 0.02422523, 0.02744058, 0.03177373)
 mae_mean <- c(0.004516192, 0.006019292, 0.004505188, 0.005004224, 0.005774427)
@@ -374,10 +415,10 @@ bias_mean <- c(0.0009861557, -0.0005405619, 0.0009861557, 0.0004772498, -0.00028
 
 
 # Gráficas rmse
-rmse <- data.table("XSTNN" = rmse_xstnn, "STNN" = rmse_stnn, "XGBoost" = rmse_xgboost, "Mean" = rmse_mean)
+rmse <- data.table("XSTNN" = rmse_xstnn, "STNN" = rmse_stnn, "XGBoost" = rmse_xgboost, "Linear" = rmse_linear, "Mean" = rmse_mean)
 rmse <- melt(rmse)
 colnames(rmse)[1] <- "model"
-rmse$timestep <- rep(seq(1,5,1), 4)
+rmse$timestep <- rep(seq(1,5,1), 5)
 
 p1_line <- ggplot(data = rmse, aes(x = timestep, y = value, group = model, color = model)) +
   geom_line(size = 1) +
@@ -406,10 +447,10 @@ p1_box <- ggplot(data = rmse, aes(x = model, y = value, group = model, color = m
 
 
 # Gráficas mae
-mae <- data.table("XSTNN" = mae_xstnn, "STNN" = mae_stnn, "XGBoost" = mae_xgboost, "Mean" = mae_mean)
+mae <- data.table("XSTNN" = mae_xstnn, "STNN" = mae_stnn, "XGBoost" = mae_xgboost, "Linear" = mae_linear, "Mean" = mae_mean)
 mae <- melt(mae)
 colnames(mae)[1] <- "model"
-mae$timestep <- rep(seq(1,5,1), 4)
+mae$timestep <- rep(seq(1,5,1), 5)
 
 p2_line <- ggplot(data = mae, aes(x = timestep, y = value, group = model, color = model)) +
   geom_line(size = 1) +
@@ -438,10 +479,10 @@ p2_box <- ggplot(data = mae, aes(x = model, y = value, group = model, color = mo
 
 
 # Gráficas bias
-bias <- data.table("XSTNN" = bias_xstnn, "STNN" = bias_stnn, "XGBoost" = bias_xgboost, "Mean" = bias_mean)
+bias <- data.table("XSTNN" = bias_xstnn, "STNN" = bias_stnn, "XGBoost" = bias_xgboost, "Linear" = bias_linear, "Mean" = bias_mean)
 bias <- melt(bias)
 colnames(bias)[1] <- "model"
-bias$timestep <- rep(seq(1,5,1), 4)
+bias$timestep <- rep(seq(1,5,1), 5)
 
 p3_line <- ggplot(data = bias, aes(x = timestep, y = value, group = model, color = model)) +
   geom_line(size = 1) +
