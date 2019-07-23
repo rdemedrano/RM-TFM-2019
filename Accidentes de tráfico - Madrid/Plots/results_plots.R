@@ -414,43 +414,54 @@ mae_mean <- c(0.004516192, 0.006019292, 0.004505188, 0.005004224, 0.005774427)
 bias_mean <- c(0.0009861557, -0.0005405619, 0.0009861557, 0.0004772498, -0.0002861089)
 
 
+# Persistence
+rmse_pers <- c(0.04014393, 0.04604825, 0.04014393, 0.04220392, 0.04511788)
+mae_pers <- c(0.004834606, 0.006361323, 0.004834606, 0.005343511, 0.006106870)
+bias_pers <- c(0.0012722646, -0.0002544529, 0.0012722646, 0.0007633588, 0.0000000000)
+
 # Gráficas rmse
-rmse <- data.table("XSTNN" = rmse_xstnn, "STNN" = rmse_stnn, "XGBoost" = rmse_xgboost, "Linear" = rmse_linear, "Mean" = rmse_mean)
+rmse <- data.table("XSTNN" = rmse_xstnn, "STNN" = rmse_stnn, 
+                   "XGBoost" = rmse_xgboost, "Linear" = rmse_linear,
+                   "Mean" = rmse_mean, "Persistence" = rmse_pers)
 rmse <- melt(rmse)
 colnames(rmse)[1] <- "model"
-rmse$timestep <- rep(seq(1,5,1), 5)
+rmse$timestep <- rep(seq(1,5,1), 6)
 
 p1_line <- ggplot(data = rmse, aes(x = timestep, y = value, group = model, color = model)) +
   geom_line(size = 1) +
-  scale_y_continuous(limits = c(0.02, 0.04)) +
+  scale_y_continuous(limits = c(0.02, 0.05)) +
   labs(x = "Timestep", y = "RMSE") +
   theme_bw() +
   theme(axis.text = element_text(size=18),
         text = element_text(size=20), 
         legend.position="none",
-        axis.title.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30, margin = margin(l = 7)),
+        axis.text.y = element_text(margin = margin(l = 9)),
         axis.title.x=element_blank(),
         axis.text.x = element_blank())
 
 
 p1_box <- ggplot(data = rmse, aes(x = model, y = value, group = model, color = model)) +
   geom_boxplot() +
-  scale_y_continuous(limits = c(0.02, 0.04)) +
+  scale_y_continuous(limits = c(0.02, 0.05)) +
   labs(x = "Model", y = "RMSE") +
   theme_bw() +
   theme(axis.text = element_text(size=18),
         text = element_text(size=20),
         axis.title.y=element_blank(),
+        axis.text.y = element_text(margin = margin(l = 15)),
         axis.title.x=element_blank(),
         axis.text.x = element_blank(),
         legend.position = "none")
 
 
 # Gráficas mae
-mae <- data.table("XSTNN" = mae_xstnn, "STNN" = mae_stnn, "XGBoost" = mae_xgboost, "Linear" = mae_linear, "Mean" = mae_mean)
+mae <- data.table("XSTNN" = mae_xstnn, "STNN" = mae_stnn, 
+                  "XGBoost" = mae_xgboost, "Linear" = mae_linear, 
+                  "Mean" = mae_mean, "Persistence" = mae_pers)
 mae <- melt(mae)
 colnames(mae)[1] <- "model"
-mae$timestep <- rep(seq(1,5,1), 5)
+mae$timestep <- rep(seq(1,5,1), 6)
 
 p2_line <- ggplot(data = mae, aes(x = timestep, y = value, group = model, color = model)) +
   geom_line(size = 1) +
@@ -479,10 +490,12 @@ p2_box <- ggplot(data = mae, aes(x = model, y = value, group = model, color = mo
 
 
 # Gráficas bias
-bias <- data.table("XSTNN" = bias_xstnn, "STNN" = bias_stnn, "XGBoost" = bias_xgboost, "Linear" = bias_linear, "Mean" = bias_mean)
+bias <- data.table("XSTNN" = bias_xstnn, "STNN" = bias_stnn, 
+                   "XGBoost" = bias_xgboost, "Linear" = bias_linear, 
+                   "Mean" = bias_mean, "Persistence" = bias_pers)
 bias <- melt(bias)
 colnames(bias)[1] <- "model"
-bias$timestep <- rep(seq(1,5,1), 5)
+bias$timestep <- rep(seq(1,5,1), 6)
 
 p3_line <- ggplot(data = bias, aes(x = timestep, y = value, group = model, color = model)) +
   geom_line(size = 1) +
@@ -491,7 +504,8 @@ p3_line <- ggplot(data = bias, aes(x = timestep, y = value, group = model, color
   theme_bw() +
   theme(axis.text = element_text(size=18),
         text = element_text(size=20),
-        axis.title.y = element_text(size = 30),
+        axis.title.y = element_text(size = 30, margin = margin(b = 100)),
+        axis.text.x = element_text(margin = margin(b = 50)),
         legend.position="none")
 
 p3_box <- ggplot(data = bias, aes(x = model, y = value, group = model, color = model)) +
@@ -502,9 +516,11 @@ p3_box <- ggplot(data = bias, aes(x = model, y = value, group = model, color = m
   theme(axis.text = element_text(size=18),
         text = element_text(size=20),
         axis.title.y=element_blank(),
-        legend.position = "none")
+        legend.position = "none", 
+        axis.text.x = element_text(angle=35, hjust=1))
 
-grid.arrange(p2_line, p2_box, p1_line, p1_box, p3_line, p3_box, nrow = 3, widths=c(2,1))
+grid.arrange(p2_line, p2_box, p1_line, p1_box, p3_line, p3_box, 
+             nrow = 3, widths=c(2,1))
 
 
 
